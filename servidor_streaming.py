@@ -19,7 +19,6 @@ server_socket.bind(socket_address) #Iniciando servidor no socket_address
 print("Ouvindo em: ",socket_address)
 
 video = cv2.VideoCapture("./Videos/Sony_Demo_720p.mp4") #Captura do video
-#fps,st,frames_to_count,cnt = (0,0,20,0) #Variáveis para obter framerate
 
 while True: #Loop para o servidor receber dados de cada cliente no endereço socket
     msg,client_addr = server_socket.recvfrom(BUFFER_SIZE) #Recebendo mensagem msg do cliente
