@@ -4,7 +4,7 @@ HOST = ''
 PORT = 6000
 BUFFER_SIZE = 1024
 
-#Servidor de Streaming na porta 6000 - teste
+#Servidor de Streaming na porta 6000
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
     udp.bind((HOST, PORT))
 
