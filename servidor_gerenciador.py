@@ -4,7 +4,7 @@ import threading
 HOST = '127.0.0.1'
 PORT = 5000
 
-#Servidor Gerenciador na porta 5000 teste
+#Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
 
