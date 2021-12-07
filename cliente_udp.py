@@ -6,6 +6,9 @@ import base64 #Converte dados de imagem em formato texto
 import os
 import pyaudio, wave
 import pickle, struct
+import queue, threading
+
+queue_audio = queue.Queue(maxsize=2000)
 
 #==============================#
 #=           GET_IP           =#
@@ -26,9 +29,6 @@ BUFFER_SIZE = 65536
 UDP_PORT = 6000
 BREAK = False
 
-#Socket para o Audio
-client_socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do cliente
-client_socket_audio.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
 
 #Socket para o video
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do cliente
@@ -46,7 +46,7 @@ def receive_video():
     cv2.namedWindow("Video no Cliente")
     cv2.moveWindow("Video no Cliente",10,360)
     fps,st,frames_to_count,cnt = (0,0,200,0)
-
+	
     #Receber datagrama de dados do servidor, no lado do cliente
     while True:
         packet,_ = client_socket.recvfrom(BUFFER_SIZE)
@@ -71,8 +71,10 @@ def receive_video():
 
 def receive_audio():
 	
+	client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
 	p = pyaudio.PyAudio()
-	CHUNK = 1024
+	CHUNK = 10*1024
 	stream = p.open(format=p.get_format_from_width(2),
 					channels=2,
 					rate=44100,
@@ -80,40 +82,28 @@ def receive_audio():
 					frames_per_buffer=CHUNK)
 					
 	# create socket
-	client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	message = b'Hello from Client'
+	client_socket.sendto(message,(host_ip,UDP_PORT-1))
 	socket_address = (host_ip,UDP_PORT-1)
-
-	client_socket.connect(socket_address) 
-	print("Cliente conectado a:",socket_address)
-	data = b""
-	payload_size = struct.calcsize("Q")
+	
+	def getAudioData():
+		while True:
+			frame,_= client_socket.recvfrom(BUFFER_SIZE)
+			queue_audio.put(frame)
+			print('Queue size...',queue_audio.qsize())
+	t1 = threading.Thread(target=getAudioData, args=())
+	t1.start()
+	time.sleep(0.1)
+	print('Now Playing...')
 	while True:
-		try:
-			while len(data) < payload_size:
-				packet = client_socket.recv(4*1024) # 4K
-				if not packet: break
-				data+=packet
-			packed_msg_size = data[:payload_size]
-			data = data[payload_size:]
-			msg_size = struct.unpack("Q",packed_msg_size)[0]
-			while len(data) < msg_size:
-				data += client_socket.recv(4*1024)
-			frame_data = data[:msg_size]
-			data  = data[msg_size:]
-			frame = pickle.loads(frame_data)
-			stream.write(frame)
-
-		except:
-			
-			break
-
-	client_socket.close()
-	print('Transmissao do Audio encerrada',BREAK)
-	os._exit(1)
+		frame = queue_audio.get()
+		stream.write(frame)
 
 
+t1 = threading.Thread(target=receive_audio, args=())
+t1.start()
 #Executa paralelamente as 2 funções com Thread
 from concurrent.futures import ThreadPoolExecutor
 with ThreadPoolExecutor(max_workers=2) as executor:
-    executor.submit(receive_audio)
+    #executor.submit(receive_audio)
     executor.submit(receive_video)

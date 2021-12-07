@@ -8,6 +8,7 @@ import queue
 import wave #manipular audio
 import pyaudio
 import pickle, struct
+import threading
 
 #Fila 'q' dos frames
 q = queue.Queue(maxsize=10)
@@ -16,7 +17,8 @@ q = queue.Queue(maxsize=10)
 #= Gerar arquivo de Audio wav =#
 #==============================#
 
-name_Video = "./Videos/Sony_Demo_720p.mp4"
+#name_Video = "./Videos/Sony_Demo_720p.mp4"
+name_Video = "./Videos/interstellar_720p.mp4"
 command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(name_Video,"audio.wav")
 os.system(command) #executa comando ffmpeg
 
@@ -50,18 +52,13 @@ socket_address = (host_ip,UDP_PORT)
 server_socket.bind(socket_address) #Iniciando servidor no socket_address
 print("(Video) Ouvindo em: ",socket_address)
 
-#Conexão para Audio
-server_socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do servidor
-server_socket_audio.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
-socket_address_audio = (host_ip,UDP_PORT-1) #Porta -1 para o Audio
-server_socket_audio.bind(socket_address_audio) #Iniciando servidor no socket_address_audio
-print("(Audio) Ouvindo em: ",socket_address_audio)
-
 
 #==============================#
 #=       Tratando Video       =#
 #==============================#
-video = cv2.VideoCapture("./Videos/Sony_Demo_720p.mp4") #Captura do video
+#video = cv2.VideoCapture("./Videos/Sony_Demo_720p.mp4") #Captura do video
+video = cv2.VideoCapture("./Videos/interstellar_720p.mp4") #Captura do video
+#video = cv2.VideoCapture("{name_Video}") #Captura do video
 FPS = video.get(cv2.CAP_PROP_FPS) #Pegando FPS do video original
 global TS
 TS = (0.5/FPS)
@@ -125,34 +122,39 @@ def video_stream():
             
 #enviar audio
 def audio_stream():
-    s = socket.socket()
-    s.bind((host_ip, (UDP_PORT-1)))
 
-    s.listen(5)
-    CHUNK = 1024
-    wf = wave.open("audio.wav", 'rb')
+    server_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
+
+    server_socket.bind((host_ip, (UDP_PORT-1)))
+    CHUNK = 10*1024
+    wf = wave.open("audio.wav")
     p = pyaudio.PyAudio()
-    print('(Audio) Servidor ouvindo em:)',(host_ip, (UDP_PORT-1)))
+    print('server listening at',(host_ip, (UDP_PORT-1)),wf.getframerate())
     stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
                     channels=wf.getnchannels(),
                     rate=wf.getframerate(),
                     input=True,
                     frames_per_buffer=CHUNK)
 
-    client_socket,addr = s.accept()
-
+    data = None
+    sample_rate = wf.getframerate()
     while True:
-        if client_socket:
-            while True:
-                data = wf.readframes(CHUNK)
-                a = pickle.dumps(data)
-                message = struct.pack("Q",len(a))+a
-                client_socket.sendall(message)
+        msg,client_addr = server_socket.recvfrom(BUFFER_SIZE)
+        print('GOT connection from ',client_addr,msg)
+        
+        while True:
+            data = wf.readframes(CHUNK)
+            server_socket.sendto(data,client_addr)
+            time.sleep(0.8*CHUNK/sample_rate)
 
+
+t1 = threading.Thread(target=audio_stream, args=())
+t1.start()
 
 #Executa paralelamente as 3 funções com Thread
 from concurrent.futures import ThreadPoolExecutor
 with ThreadPoolExecutor(max_workers=3) as executor:
-    executor.submit(audio_stream)
+    #executor.submit(audio_stream)
     executor.submit(video_stream_generator)
     executor.submit(video_stream)
