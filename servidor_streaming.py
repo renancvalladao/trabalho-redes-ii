@@ -149,12 +149,21 @@ def audio_stream():
             time.sleep(0.8*CHUNK/sample_rate)
 
 
-t1 = threading.Thread(target=audio_stream, args=())
-t1.start()
+#Gerando multithreading
+thread_audio = threading.Thread(target=audio_stream, args=())
+thread_audio.start()
 
+thread_video_gen = threading.Thread(target=video_stream_generator, args=())
+thread_video_gen.start()
+
+thread_video = threading.Thread(target=video_stream, args=())
+thread_video.start()
+
+'''
 #Executa paralelamente as 3 funções com Thread
 from concurrent.futures import ThreadPoolExecutor
 with ThreadPoolExecutor(max_workers=3) as executor:
     #executor.submit(audio_stream)
     executor.submit(video_stream_generator)
     executor.submit(video_stream)
+'''
