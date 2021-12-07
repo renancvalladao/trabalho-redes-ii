@@ -3,7 +3,7 @@ import cv2, imutils
 import time
 import numpy as np
 import base64 #Converte dados de imagem em formato texto
-import os #funcões DE INTERFACE COM O SISTEMA OPERACIONAL teste
+import os #funcões DE INTERFACE COM O SISTEMA OPERACIONAL
 import queue
 import wave #manipular audio
 import pyaudio
