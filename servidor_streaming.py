@@ -71,12 +71,13 @@ print(durationInSeconds,d)
 
 
 def video_stream_generator():
+
     WIDTH = 400 #Caber em um único datagrama
     while(video.isOpened()):
         try:
             _,frame = video.read()
             frame = imutils.resize(frame,width=WIDTH)
-            q.put(frame)
+            q.put(frame) #frames na queue
         except:
             os._exit(1) #fecha transmissao
     print("Transmissão Fechada")
