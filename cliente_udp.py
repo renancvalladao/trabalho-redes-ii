@@ -58,7 +58,7 @@ def receive_video():
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             client_socket.close()
-            os.exit(1)
+            os._exit(1)
 
         if cnt == frames_to_count:
             try:
