@@ -11,9 +11,12 @@ BUFFER_SIZE = 65536
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do servidor
 server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
 host_name = socket.gethostname()
-host_ip = '192.168.1.106' #Host local
-print("host_ip: ",host_ip)
 
+#Pegar host dinâmicamente
+host_ip = socket.gethostbyname(socket.gethostname())
+#host_ip = '192.168.1.106' #Host local - comentado
+
+print("host_ip: ",host_ip)
 socket_address = (host_ip,UDP_PORT)
 server_socket.bind(socket_address) #Iniciando servidor no socket_address
 print("Ouvindo em: ",socket_address)

@@ -10,7 +10,10 @@ UDP_PORT = 6000
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do cliente
 client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
 host_name = socket.gethostname()
-host_ip = '192.168.1.106'
+
+#Pegar host dinâmicamente
+host_ip = socket.gethostbyname(socket.gethostname())
+#host_ip = '192.168.1.106' comentado
 print(host_ip)
 
 message = b"Hello" #Mensagem enviada ao servidor
