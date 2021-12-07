@@ -7,7 +7,7 @@ import os #funcões DE INTERFACE COM O SISTEMA OPERACIONAL
 import queue
 import wave #manipular audio
 
-#Fila dos frames
+#Fila 'q' dos frames
 q = queue.Queue(maxsize=10)
 
 #==============================#
@@ -16,7 +16,7 @@ q = queue.Queue(maxsize=10)
 
 name_Video = "./Videos/Sony_Demo_720p.mp4"
 command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(name_Video,"audio.wav")
-os.system(command)
+os.system(command) #executa comando ffmpeg
 
 #==============================#
 #=           GET_IP           =#
@@ -63,7 +63,7 @@ print(durationInSeconds,d)
 
 
 def video_stream_generator():
-    WIDTH = 400
+    WIDTH = 400 #Caber em um único datagrama
     while(video.isOpened()):
         try:
             _,frame = video.read()
@@ -86,12 +86,11 @@ def video_stream():
         print("Mensagem recebida: ",msg)
 
         #Enviar imagens ao cliente
-        WIDTH = 400 #Caber em um único datagrama
         while(True):
-            frame = q.get()
+            frame = q.get() #pega frame da fila
             encoded,buffer = cv2.imencode('.jpeg',frame,[cv2.IMWRITE_JPEG_QUALITY,80]) #Colocar/Encode a imagem em JPEG com qualidade de 80% após o resize
             message = base64.b64encode(buffer) #Converter dado binario em texto e vice versa com base64
-            server_socket.sendto(message,client_addr) #Envio da mensagem ao cliente
+            server_socket.sendto(message,client_addr) #Envio da mensagem ao cliente (do frame)
             
             #Controle de frames ao enviar a 'message'    
             if cnt == frames_to_count:
@@ -109,9 +108,8 @@ def video_stream():
                     pass
             cnt +=1
             cv2.waitKey(int(1000*TS)) & 0xFF
-            print(TS)
             
-
+#enviar audio
 def audio_stream():
     pass
 
