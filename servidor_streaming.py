@@ -6,6 +6,8 @@ import base64 #Converte dados de imagem em formato texto
 import os #funcões DE INTERFACE COM O SISTEMA OPERACIONAL
 import queue
 import wave #manipular audio
+import pyaudio
+import pickle, struct
 
 #Fila 'q' dos frames
 q = queue.Queue(maxsize=10)
@@ -34,17 +36,26 @@ def getHostName():
 HOST = ''
 UDP_PORT = 6000
 BUFFER_SIZE = 65536
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do servidor
-server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
+
 
 host_ip = getIP() #Pegar host_ip e host_name dinamicamente
 host_name = getHostName()
 print("host_ip: ",host_ip)
 print("host_name: ",host_name)
 
+#Conexão de Video
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do servidor
+server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
 socket_address = (host_ip,UDP_PORT)
 server_socket.bind(socket_address) #Iniciando servidor no socket_address
-print("Ouvindo em: ",socket_address)
+print("(Video) Ouvindo em: ",socket_address)
+
+#Conexão para Audio
+server_socket_audio = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Socket UDP do servidor
+server_socket_audio.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
+socket_address_audio = (host_ip,UDP_PORT-1) #Porta -1 para o Audio
+server_socket_audio.bind(socket_address_audio) #Iniciando servidor no socket_address_audio
+print("(Audio) Ouvindo em: ",socket_address_audio)
 
 
 #==============================#
@@ -107,11 +118,36 @@ def video_stream():
                 except:
                     pass
             cnt +=1
-            cv2.waitKey(int(1000*TS)) & 0xFF
+            cv2.imshow('Video Servidor', frame)
+            key = cv2.waitKey(int(1000*TS)) & 0xFF	
+            if key == ord('q'):
+                os._exit(1)
             
 #enviar audio
 def audio_stream():
-    pass
+    s = socket.socket()
+    s.bind((host_ip, (UDP_PORT-1)))
+
+    s.listen(5)
+    CHUNK = 1024
+    wf = wave.open("audio.wav", 'rb')
+    p = pyaudio.PyAudio()
+    print('(Audio) Servidor ouvindo em:)',(host_ip, (UDP_PORT-1)))
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    client_socket,addr = s.accept()
+
+    while True:
+        if client_socket:
+            while True:
+                data = wf.readframes(CHUNK)
+                a = pickle.dumps(data)
+                message = struct.pack("Q",len(a))+a
+                client_socket.sendall(message)
 
 
 #Executa paralelamente as 3 funções com Thread
