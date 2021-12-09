@@ -12,7 +12,8 @@ BT_BACKGROUND_COLOR = '#103d72'
 BT_FOREGROUND_COLOR = 'white'
 BT_BORDER = 3
 
-class JanelaLogin():
+
+class JanelaLogin:
     def __init__(self):
         # Criação da janela de login
         self.root = Tk()
@@ -103,7 +104,8 @@ class JanelaLogin():
         # Fecha a janela atual
         self.root.destroy()
 
-class JanelaMenu():
+
+class JanelaMenu:
     def __init__(self, parent):
         # Cria a janela de menu
         self.root = Toplevel()
@@ -157,15 +159,16 @@ class JanelaMenu():
         self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
         # Criação e posicionamento do botão que acessa o catálogo de vídeos
-        self.bt_videos = Button(self.root, text="Catálogo de vídeos", font=LB_FONT, bd=BT_BORDER, command=self.bt_videos_click,
-                               bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        self.bt_videos = Button(self.root, text="Catálogo de vídeos", font=LB_FONT, bd=BT_BORDER,
+                                command=self.bt_videos_click,
+                                bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_videos.place(relx=0.35, rely=0.6, relwidth=0.3, relheight=0.15)
 
     # Função executada ao clicar no botão bt_grupo
     def bt_grupo_click(self):
         # Somente para a parte 2 do trabalho
         pass
-    
+
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
         # Chama a janela de catálogo de vídeos (passa a janela atual e seu pai)
@@ -183,7 +186,8 @@ class JanelaMenu():
         # Fecha a janela pai
         self.parent.root.destroy()
 
-class JanelaVideos():
+
+class JanelaVideos:
     def __init__(self, parents):
         # Cria a janela de catálogo de vídeos
         self.root = Toplevel()
@@ -238,11 +242,11 @@ class JanelaVideos():
         # 
 
         # lista exemplo de vídeos
-        videos = ["video1.mp4",  "video2.mp4",  "video3.mp4",  "video4.mp4",  "video5.mp4",
-                  "video6.mp4",  "video7.mp4",  "video8.mp4",  "video9.mp4",  "video10.mp4",
+        videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
+                  "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
                   "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
                   "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
-                  "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4",]
+                  "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
 
         # Criação e posicionamento da lista de vídeos disponíveis
         self.lista_videos = ttk.Treeview(self.root, column=("col0", "col1"))
@@ -255,7 +259,7 @@ class JanelaVideos():
         # Criação e posicionamento da barra de rolamento
         self.scroll_lista = Scrollbar(self.root, orient='vertical')
         self.scroll_lista.place(relx=0.91, rely=0.065, relheight=0.75)
-        
+
         # Conecta a barra de rolamento com a lista de vídeos
         self.scroll_lista['command'] = self.lista_videos.yview
         self.lista_videos.configure(yscroll=self.scroll_lista.set)
@@ -265,7 +269,8 @@ class JanelaVideos():
             self.lista_videos.insert("", END, values=video)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
-        self.bt_assistir = Button(self.root, text="Assistir vídeo", font=LB_FONT, bd=BT_BORDER, command=self.bt_assistir_click,
+        self.bt_assistir = Button(self.root, text="Assistir vídeo", font=LB_FONT, bd=BT_BORDER,
+                                  command=self.bt_assistir_click,
                                   bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_assistir.place(relx=0.35, rely=0.85, relwidth=0.3, relheight=0.05)
 
@@ -293,17 +298,20 @@ class JanelaVideos():
             self.janela_resolucao.grab_set()
 
             # Criação e posicionamento do botão que define resolução como 240p
-            self.bt_res_240 = Button(self.janela_resolucao, text="240p", font=LB_FONT, bd=BT_BORDER, command=self.bt_res_240_click,
+            self.bt_res_240 = Button(self.janela_resolucao, text="240p", font=LB_FONT, bd=BT_BORDER,
+                                     command=self.bt_res_240_click,
                                      bg='gray35', fg=BT_FOREGROUND_COLOR)
             self.bt_res_240.place(relx=0.35, rely=0.18, relwidth=0.3, relheight=0.15)
 
             # Criação e posicionamento do botão que define resolução como 480p
-            self.bt_res_480 = Button(self.janela_resolucao, text="480p", font=LB_FONT, bd=BT_BORDER, command=self.bt_res_480_click,
+            self.bt_res_480 = Button(self.janela_resolucao, text="480p", font=LB_FONT, bd=BT_BORDER,
+                                     command=self.bt_res_480_click,
                                      bg='gray35', fg=BT_FOREGROUND_COLOR)
             self.bt_res_480.place(relx=0.35, rely=0.43, relwidth=0.3, relheight=0.15)
 
             # Criação e posicionamento do botão que define resolução como 720p
-            self.bt_res_720 = Button(self.janela_resolucao, text="720p", font=LB_FONT, bd=BT_BORDER, command=self.bt_res_720_click,
+            self.bt_res_720 = Button(self.janela_resolucao, text="720p", font=LB_FONT, bd=BT_BORDER,
+                                     command=self.bt_res_720_click,
                                      bg='gray35', fg=BT_FOREGROUND_COLOR)
             self.bt_res_720.place(relx=0.35, rely=0.68, relwidth=0.3, relheight=0.15)
 
@@ -341,7 +349,7 @@ class JanelaVideos():
     def assistir_video(self):
         pass
         # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
-        
+
         # 
         # Código para pedir o vídeo ao servidor
         # 
@@ -350,7 +358,7 @@ class JanelaVideos():
     def voltar(self):
         # Fecha a janela atual
         self.root.destroy()
-    
+
     # Volta para a janela de login
     def logout(self):
         # Fecha a janela atual
@@ -365,6 +373,7 @@ class JanelaVideos():
         # Fecha as janelas antecessoras
         for parent in self.parents:
             parent.root.destroy()
+
 
 if __name__ == "__main__":
     # Chama a janela de login

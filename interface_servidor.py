@@ -11,7 +11,8 @@ BT_BACKGROUND_COLOR = '#103d72'
 BT_FOREGROUND_COLOR = 'white'
 BT_BORDER = 3
 
-class InterfaceServidor():
+
+class InterfaceServidor:
     def __init__(self):
         # Cria a janela de catálogo de vídeos
         self.root = Tk()
@@ -56,11 +57,11 @@ class InterfaceServidor():
         # 
 
         # lista exemplo de vídeos
-        self.videos = ["video1.mp4",  "video2.mp4",  "video3.mp4",  "video4.mp4",  "video5.mp4",
-                       "video6.mp4",  "video7.mp4",  "video8.mp4",  "video9.mp4",  "video10.mp4",
+        self.videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
+                       "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
                        "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
                        "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
-                       "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4",]
+                       "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
 
         # Criação e posicionamento da lista de vídeos disponíveis
         self.lista_videos = ttk.Treeview(self.root, column=("col0", "col1"))
@@ -73,7 +74,7 @@ class InterfaceServidor():
         # Criação e posicionamento da barra de rolamento
         self.scroll_lista = Scrollbar(self.root, orient='vertical')
         self.scroll_lista.place(relx=0.91, rely=0.065, relheight=0.75)
-        
+
         # Conecta a barra de rolamento com a lista de vídeos
         self.scroll_lista['command'] = self.lista_videos.yview
         self.lista_videos.configure(yscroll=self.scroll_lista.set)
@@ -83,12 +84,14 @@ class InterfaceServidor():
             self.lista_videos.insert("", END, values=video)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
-        self.bt_adiciona = Button(self.root, text="Adiciona vídeo", font=BT_FONT, bd=BT_BORDER, command=self.bt_adiciona_click,
+        self.bt_adiciona = Button(self.root, text="Adiciona vídeo", font=BT_FONT, bd=BT_BORDER,
+                                  command=self.bt_adiciona_click,
                                   bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_adiciona.place(relx=0.15, rely=0.85, relwidth=0.3, relheight=0.05)
 
-        self.bt_remove = Button(self.root, text="Remove vídeo", font=BT_FONT, bd=BT_BORDER, command=self.bt_remove_click,
-                                  bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        self.bt_remove = Button(self.root, text="Remove vídeo", font=BT_FONT, bd=BT_BORDER,
+                                command=self.bt_remove_click,
+                                bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_remove.place(relx=0.55, rely=0.85, relwidth=0.3, relheight=0.05)
 
     # Função executada ao clicar no botão bt_adiciona
@@ -124,7 +127,7 @@ class InterfaceServidor():
         # Recupera o vídeo selecionado
         selecionado = self.lista_videos.selection()
         # Verifica se somente um vídeo foi selecionado
-        if len(selecionado)==1:
+        if len(selecionado) == 1:
             # Recupera o nome do arquivo do vídeo selecionado
             self.video = self.lista_videos.item(selecionado, 'values')[0]
 
@@ -132,7 +135,7 @@ class InterfaceServidor():
             self.videos.remove(self.video)
             # Chama a função que atualiza a lista de vídeos da interface
             self.atualiza_lista()
-            
+
             # 
             # Código que remove o vídeo selecionado
             # da lista de vídeos do servidor
@@ -155,6 +158,7 @@ class InterfaceServidor():
     def sair(self):
         # Fecha a janela atual
         self.root.destroy()
+
 
 if __name__ == "__main__":
     # Chama a janela de login

@@ -1,31 +1,15 @@
 import base64  # Converte dados de imagem em formato texto
-import os  # funcões DE INTERFACE COM O SISTEMA OPERACIONAL
+import os  # Funcões DE interface com o sistema operacional
 import queue
 import socket
 import threading
 import time
-import wave  # manipular audio
+import wave  # Manipular audio
 
 import cv2
 import imutils
 import pyaudio
 
-# Fila 'q' dos frames
-q = queue.Queue(maxsize=10)
-
-# ==============================#
-# = Gerar arquivo de Audio wav =#
-# ==============================#
-
-# name_Video = "./Videos/Sony_Demo_720p.mp4"
-name_Video = "./Videos/interstellar_720p.mp4"
-command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(name_Video, "audio.wav")
-os.system(command)  # executa comando ffmpeg
-
-
-#==============================#
-#=           GET_IP           =#
-#==============================#
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -35,9 +19,17 @@ def getHostName():
     return socket.gethostname()
 
 
-#==============================#
-#=       Inicializações       =#
-#==============================#
+# Fila 'q' dos frames
+q = queue.Queue(maxsize=10)
+
+# Gerar arquivo de áudio .wav
+# name_Video = "./Videos/Sony_Demo_720p.mp4"
+name_Video = "./Videos/interstellar_720p.mp4"
+command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {}".format(name_Video, "audio.wav")
+os.system(command)  # Executa comando ffmpeg
+
+
+# Inicializações
 HOST = ''
 UDP_PORT = 6000
 BUFFER_SIZE = 65536
@@ -47,18 +39,17 @@ host_name = getHostName()
 print("host_ip: ", host_ip)
 print("host_name: ", host_name)
 
-# Conexão de Video
+# Conexão de Vídeo
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do servidor
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 socket_address = (host_ip, UDP_PORT)
 server_socket.bind(socket_address)  # Iniciando servidor no socket_address
-print("(Video) Ouvindo em: ", socket_address)
+print("(Vídeo) Ouvindo em: ", socket_address)
 
-#==============================#
-#=       Tratando Video       =#
-#==============================#
-# video = cv2.VideoCapture("./Videos/Sony_Demo_720p.mp4") #Captura do video
-video = cv2.VideoCapture("./Videos/interstellar_720p.mp4")  # Captura do video
+
+# Tratando Vídeo
+# video = cv2.VideoCapture("./Videos/Sony_Demo_720p.mp4") #Captura do vídeo
+video = cv2.VideoCapture("./Videos/interstellar_720p.mp4")  # Captura do vídeo
 # video = cv2.VideoCapture("{name_Video}") #Captura do video
 FPS = video.get(cv2.CAP_PROP_FPS)  # Pegando FPS do video original
 global TS
@@ -73,11 +64,11 @@ print(durationInSeconds, d)
 
 def video_stream_generator():
     WIDTH = 400  # Caber em um único datagrama
-    while (video.isOpened()):
+    while video.isOpened():
         try:
             _, frame = video.read()
             frame = imutils.resize(frame, width=WIDTH)
-            q.put(frame)  # frames na queue
+            q.put(frame)  # Frames na queue
         except:
             os._exit(1)  # fecha transmissao
     print("Transmissão Fechada")
@@ -99,7 +90,7 @@ def video_stream():
             frame = q.get()  # pega frame da fila
             encoded, buffer = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY,
                                                             80])  # Colocar/Encode a imagem em JPEG com qualidade de 80% após o resize
-            message = base64.b64encode(buffer)  # Converter dado binario em texto e vice versa com base64
+            message = base64.b64encode(buffer)  # Converter dado binário em texto e vice versa com base64
             server_socket.sendto(message, client_addr)  # Envio da mensagem ao cliente (do frame)
 
             # Controle de frames ao enviar a 'message'
@@ -123,7 +114,7 @@ def video_stream():
                 os._exit(1)
 
 
-# enviar audio
+# Enviar audio
 def audio_stream():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)

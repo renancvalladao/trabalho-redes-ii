@@ -9,12 +9,9 @@ import cv2
 import numpy as np
 import pyaudio
 
-queue_audio = queue.Queue(maxsize=2000)
+# Executa paralelamente as 2 funções com Thread
+from concurrent.futures import ThreadPoolExecutor
 
-
-#==============================#
-#=           GET_IP           =#
-#==============================#
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -24,15 +21,14 @@ def getHostName():
     return socket.gethostname()
 
 
-#==============================#
-#=       Inicializações       =#
-#==============================#
+queue_audio = queue.Queue(maxsize=2000)
 
+# Inicializações
 BUFFER_SIZE = 65536
 UDP_PORT = 6000
 BREAK = False
 
-# Socket para o video
+# Socket para o vídeo
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do cliente
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 
@@ -105,8 +101,6 @@ def receive_audio():
 
 t1 = threading.Thread(target=receive_audio, args=())
 t1.start()
-# Executa paralelamente as 2 funções com Thread
-from concurrent.futures import ThreadPoolExecutor
 
 with ThreadPoolExecutor(max_workers=2) as executor:
     # executor.submit(receive_audio)
