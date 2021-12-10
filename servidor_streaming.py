@@ -21,6 +21,22 @@ def getHostName():
     return socket.gethostname()
 
 
+def conectarCliente(mensagem, client):
+    print(mensagem)
+    if mensagem == mensagens.REPRODUZIR_VIDEO:
+        nomeVideo, client = server_socket.recvfrom(BUFFER_SIZE)
+        nomeVideo = nomeVideo.decode("utf-8")
+        server_socket.sendto(b'Reproduzindo video ' + nomeVideo.encode("utf-8"), client)
+
+    elif mensagem == mensagens.LISTAR_VIDEOS:
+        server_socket.sendto(mensagens.LISTA_DE_VIDEOS.encode("utf-8"), client)
+        lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
+        lista_de_videos_total = list(map(lambda video: video[0:(len(video)-9)], lista_de_videos_total))
+        lista_de_videos = set()
+        lista_de_videos.update(lista_de_videos_total)
+        server_socket.sendto(pickle.dumps(lista_de_videos), client)
+
+
 # Fila 'q' dos frames
 q = queue.Queue(maxsize=10)
 
@@ -48,20 +64,8 @@ print("(UDP) Ouvindo em: ", socket_address)
 while True:
     mensagem, client = server_socket.recvfrom(BUFFER_SIZE)
     mensagem = mensagem.decode("utf-8")
-    print(mensagem)
+    threading.Thread(target=conectarCliente, args=(mensagem, client)).start()
 
-    if mensagem == mensagens.REPRODUZIR_VIDEO:
-        nomeVideo, client = server_socket.recvfrom(BUFFER_SIZE)
-        nomeVideo = nomeVideo.decode("utf-8")
-        server_socket.sendto(b'Reproduzindo video ' + nomeVideo.encode("utf-8"), client)
-
-    elif mensagem == mensagens.LISTAR_VIDEOS:
-        server_socket.sendto(mensagens.LISTA_DE_VIDEOS.encode("utf-8"), client)
-        lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
-        lista_de_videos_total = list(map(lambda video: video[0:(len(video)-9)], lista_de_videos_total))
-        lista_de_videos = set()
-        lista_de_videos.update(lista_de_videos_total)
-        server_socket.sendto(pickle.dumps(lista_de_videos), client)
 
 
 # # Tratando Vídeo
