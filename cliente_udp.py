@@ -39,7 +39,9 @@ def listarVideos():
     mensagem = mensagem.decode("utf-8")
     print(mensagem)
     lista_de_videos = client_socket.recv(BUFFER_SIZE)
-    print(pickle.loads(lista_de_videos))
+    lista_de_videos = pickle.loads(lista_de_videos)
+    print(lista_de_videos)
+    return lista_de_videos
 
 
 queue_audio = queue.Queue(maxsize=2000)
@@ -58,8 +60,8 @@ print("Host Name: ", host_name)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do cliente
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 
-listarVideos()
-reproduzirVideo("meuVideo")
+# listarVideos()
+# reproduzirVideo("meuVideo")
 
 # def receive_video():
 #     cv2.namedWindow("Video no Cliente")

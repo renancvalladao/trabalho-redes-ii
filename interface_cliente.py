@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import cliente_udp
 
 # Definição das constantes
 LB_FONT = ('arial', 12, 'bold')
@@ -172,7 +173,8 @@ class JanelaMenu:
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
         # Chama a janela de catálogo de vídeos (passa a janela atual e seu pai)
-        JanelaVideos([self, self.parent])
+        lista_de_videos = cliente_udp.listarVideos()
+        JanelaVideos([self, self.parent], lista_de_videos)
 
     # Volta para a janela de login
     def logout(self):
@@ -188,11 +190,13 @@ class JanelaMenu:
 
 
 class JanelaVideos:
-    def __init__(self, parents):
+    def __init__(self, parents, lista_de_videos):
         # Cria a janela de catálogo de vídeos
         self.root = Toplevel()
         # Define uma lista das janela antecessoras
         self.parents = parents
+
+        self.lista_de_videos = lista_de_videos
 
         # Configurações básicas da janela
         self.root.title("Catálogo de vídeos")
@@ -265,7 +269,7 @@ class JanelaVideos:
         self.lista_videos.configure(yscroll=self.scroll_lista.set)
 
         # Insere os vídeos disponíveis no servidor na lista
-        for video in videos:
+        for video in self.lista_de_videos:
             self.lista_videos.insert("", END, values=video)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
@@ -347,7 +351,9 @@ class JanelaVideos:
 
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
-        pass
+        nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
+        print(nome_arquivo_video)
+        cliente_udp.reproduzirVideo(nome_arquivo_video)
         # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
 
         # 
