@@ -352,7 +352,6 @@ class JanelaVideos:
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
         nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
-        print(nome_arquivo_video)
         cliente_udp.reproduzirVideo(nome_arquivo_video)
         # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
 

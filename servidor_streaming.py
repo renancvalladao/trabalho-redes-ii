@@ -65,6 +65,7 @@ while True:
     mensagem, client = server_socket.recvfrom(BUFFER_SIZE)
     mensagem = mensagem.decode("utf-8")
     threading.Thread(target=conectarCliente, args=(mensagem, client)).start()
+    time.sleep(1)
 
 
 
