@@ -18,17 +18,20 @@ class ConnectionThread(threading.Thread):
         self.video = ''
         self.mensagem = ''
         self.stop = False
+        self.finish = False
         self.client = client
         self.server_socket = server_socket
 
     def run(self):
-        while not self.stop:
+        while not self.finish:
             if self.mensagem == mensagens.LISTAR_VIDEOS:
                 self.listarVideos()
                 self.mensagem = ''
             elif self.mensagem == mensagens.REPRODUZIR_VIDEO and self.video != '':
                 self.reproduzirVideo()
                 self.mensagem = ''
+                self.video = ''
+                self.stop = False
 
     def listarVideos(self):
         self.server_socket.sendto(mensagens.LISTA_DE_VIDEOS.encode("utf-8"), self.client)
@@ -45,10 +48,6 @@ class ConnectionThread(threading.Thread):
         self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
         # Fila 'q' dos frames
         q = queue.Queue(maxsize=10)
-        # Gerar arquivo de áudio .wav
-        command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {} -n".format("./Videos/" + self.video,
-                                                                           "./Audios/" + self.video + ".wav")
-        os.system(command)  # Executa comando ffmpeg
 
         # Tratando Vídeo
         video = cv2.VideoCapture("./Videos/" + self.video)  # Captura do vídeo
@@ -91,4 +90,5 @@ class ConnectionThread(threading.Thread):
             key = cv2.waitKey(int(1000 * TS)) & 0xFF
             if key == ord('q'):
                 break
+        cv2.destroyAllWindows()
         video.release()

@@ -1,7 +1,5 @@
 import socket
 import threading
-import time
-import wave  # Manipular audio
 
 import mensagens
 from audioThread import AudioThread
@@ -40,13 +38,14 @@ def audio_stream():
     audio_threads = {}
     print('server listening at', (host_ip, (UDP_PORT - 1)))
     while True:
+        print("Esperando conexao de audio")
         msg, client_addr = audio_socket.recvfrom(BUFFER_SIZE)
         print('GOT connection from ', client_addr, msg)
-        if client_addr not in audio_threads:
-            audio_threads[client_addr] = AudioThread(audio_socket, client_addr, msg.decode("utf-8"))
-            audio_threads[client_addr].start()
         if msg == b'Stop':
             audio_threads[client_addr].stop = True
+        else:
+            audio_threads[client_addr] = AudioThread(audio_socket, client_addr, msg.decode("utf-8"))
+            audio_threads[client_addr].start()
 
 
 # Gerando multithreading

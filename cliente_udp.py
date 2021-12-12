@@ -23,6 +23,8 @@ def getHostName():
 
 
 def reproduzirVideo(nomeVideo):
+    global pararAudio
+    pararAudio = False
     message = mensagens.REPRODUZIR_VIDEO.encode("utf-8")  # Mensagem enviada ao servidor
     client_socket.sendto(message, (host_ip, UDP_PORT))
     client_socket.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT))
@@ -50,12 +52,12 @@ def reproduzirVideo(nomeVideo):
                 client_socket.sendto(message, (host_ip, UDP_PORT))
                 global pararAudio
                 pararAudio = True
+                cv2.destroyAllWindows()
                 break
         print("Encerrando transmissão de video")
 
     def receive_audio():
-        audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        audio_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
+        print("Começando a receber audio")
         p = pyaudio.PyAudio()
         CHUNK = 10 * 1024
         stream = p.open(format=p.get_format_from_width(2),
@@ -69,10 +71,12 @@ def reproduzirVideo(nomeVideo):
 
         def getAudioData():
             global pararAudio
-            while not pararAudio:
+            while True:
                 frame, _ = audio_socket.recvfrom(BUFFER_SIZE)
+                if frame == b'Stopped':
+                    break
                 queue_audio.put(frame)
-                print('Queue size...', queue_audio.qsize())
+            print("Encerrando aquisição de dados de audio")
 
         t3 = threading.Thread(target=getAudioData, args=())
         t3.start()
@@ -117,5 +121,8 @@ print("Host Name: ", host_name)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do cliente
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 
+audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+audio_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
+
 # listarVideos()
-reproduzirVideo("interstellar_720p.mp4")
+# reproduzirVideo("interstellar_720p.mp4")
