@@ -20,7 +20,7 @@ class AudioThread(threading.Thread):
         command = "ffmpeg -i {} -ab 160k -ac 2 -ar 44100 -vn {} -y".format("./Videos/" + self.video,
                                                                            "./Audios/" + self.video + ".wav")
         os.system(command)  # Executa comando ffmpeg
-        time.sleep(1)
+        #time.sleep(1) comentando, causou erro
         wf = wave.open("Audios/" + self.video + ".wav")
         sample_rate = wf.getframerate()
         while not self.stop:
