@@ -1,9 +1,9 @@
 import base64
 import os
 import pickle
+import queue
 import threading
 import time
-import queue
 
 import cv2
 import imutils
@@ -39,6 +39,10 @@ class ConnectionThread(threading.Thread):
         self.server_socket.sendto(pickle.dumps(lista_de_videos), self.client)
 
     def reproduzirVideo(self):
+        nomeVideo = self.video[0:(len(self.video)-9)]
+        resolucao = self.video[(len(self.video)-8):(len(self.video)-4)]
+        mensagem_video = "REPRODUZINDO O VÍDEO " + nomeVideo + ", COM RESOLUÇÃO " + resolucao
+        self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
         # Fila 'q' dos frames
         q = queue.Queue(maxsize=10)
         # Gerar arquivo de áudio .wav

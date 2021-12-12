@@ -11,6 +11,8 @@ import mensagens
 import numpy as np
 import pyaudio
 
+pararAudio = False
+
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -25,9 +27,10 @@ def reproduzirVideo(nomeVideo):
     client_socket.sendto(message, (host_ip, UDP_PORT))
     client_socket.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT))
     queue_audio = queue.Queue(maxsize=2000)
-    # mensagem = client_socket.recv(BUFFER_SIZE)
-    # mensagem = mensagem.decode("utf-8")
-    # print(mensagem)
+
+    video_mensagem = client_socket.recv(BUFFER_SIZE)
+    video_mensagem = video_mensagem.decode("utf-8")
+    print(video_mensagem)
 
     def receive_video():
         cv2.namedWindow("Video no Cliente")
@@ -45,7 +48,10 @@ def reproduzirVideo(nomeVideo):
             if key == ord('q'):
                 message = mensagens.PARAR_STREAMING.encode("utf-8")  # Mensagem enviada ao servidor
                 client_socket.sendto(message, (host_ip, UDP_PORT))
-                os._exit(1)
+                global pararAudio
+                pararAudio = True
+                break
+        print("Encerrando transmissão de video")
 
     def receive_audio():
         audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -59,11 +65,11 @@ def reproduzirVideo(nomeVideo):
                         frames_per_buffer=CHUNK)
 
         # create socket
-        message = b'Hello from Client'
-        audio_socket.sendto(message, (host_ip, UDP_PORT - 1))
+        audio_socket.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT - 1))
 
         def getAudioData():
-            while True:
+            global pararAudio
+            while not pararAudio:
                 frame, _ = audio_socket.recvfrom(BUFFER_SIZE)
                 queue_audio.put(frame)
                 print('Queue size...', queue_audio.qsize())
@@ -72,9 +78,12 @@ def reproduzirVideo(nomeVideo):
         t3.start()
         time.sleep(0.1)
         print('Now Playing...')
-        while True:
+        global pararAudio
+        while not pararAudio:
             frame = queue_audio.get()
             stream.write(frame)
+        audio_socket.sendto(b'Stop', (host_ip, UDP_PORT - 1))
+        print("Encerrando transmissão de audio")
 
     t1 = threading.Thread(target=receive_audio, args=())
     t1.start()
@@ -109,4 +118,4 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP d
 client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 
 # listarVideos()
-# reproduzirVideo("interstellar_720p.mp4")
+reproduzirVideo("interstellar_720p.mp4")
