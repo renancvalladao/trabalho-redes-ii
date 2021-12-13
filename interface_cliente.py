@@ -15,7 +15,10 @@ BT_BORDER = 3
 
 
 class JanelaLogin:
-    def __init__(self):
+    def __init__(self, parent=None):
+        # Fecha a janela anterior, se ela existir
+        if parent:
+            parent.root.destroy()
         # Criação da janela de login
         self.root = Tk()
 
@@ -108,10 +111,10 @@ class JanelaLogin:
 
 class JanelaMenu:
     def __init__(self, parent):
+        # Fecha a janela anterior
+        parent.root.destroy()
         # Cria a janela de menu
-        self.root = Toplevel()
-        # Define a janela pai
-        self.parent = parent
+        self.root = Tk()
 
         # Configurações básicas da janela
         self.root.title("Menu")
@@ -119,10 +122,6 @@ class JanelaMenu:
         self.root.geometry("700x550+280+50")
         self.root.maxsize(width=800, height=600)
         self.root.minsize(width=600, height=500)
-        # Garante que a janela pai não possa ser
-        # alcançada enquanto esta estiver aberta
-        self.root.focus_force()
-        self.root.grab_set()
 
         # Criação dos componentes da janela
         self.criar_menubar()
@@ -172,29 +171,27 @@ class JanelaMenu:
 
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
-        # Chama a janela de catálogo de vídeos (passa a janela atual e seu pai)
+        # Chama a janela de catálogo de vídeos (passa a janela atual)
         lista_de_videos = cliente_udp.listarVideos()
-        JanelaVideos([self, self.parent], lista_de_videos)
+        JanelaVideos(self, lista_de_videos)
 
     # Volta para a janela de login
     def logout(self):
-        # Fecha a janela atual
-        self.root.destroy()
+        # Chama a janela de login (passa a janela atual)
+        JanelaLogin(self)
 
     # Fecha o programa
     def sair(self):
         # Fecha a janela atual
         self.root.destroy()
-        # Fecha a janela pai
-        self.parent.root.destroy()
 
 
 class JanelaVideos:
-    def __init__(self, parents, lista_de_videos):
+    def __init__(self, parent, lista_de_videos):
+        # Fecha a janela anterior
+        parent.root.destroy()
         # Cria a janela de catálogo de vídeos
-        self.root = Toplevel()
-        # Define uma lista das janela antecessoras
-        self.parents = parents
+        self.root = Tk()
 
         self.lista_de_videos = lista_de_videos
 
@@ -204,10 +201,6 @@ class JanelaVideos:
         self.root.geometry("700x550+280+50")
         self.root.maxsize(width=800, height=600)
         self.root.minsize(width=600, height=500)
-        # Garante que a janela pai não possa ser
-        # alcançada enquanto esta estiver aberta
-        self.root.focus_force()
-        self.root.grab_set()
 
         # Criação dos componentes da janela
         self.criar_menubar()
@@ -361,23 +354,18 @@ class JanelaVideos:
 
     # Volta para a janela de menu
     def voltar(self):
-        # Fecha a janela atual
-        self.root.destroy()
+        # Chama a janela de menu (passa a janela atual)
+        JanelaMenu(self)
 
     # Volta para a janela de login
     def logout(self):
-        # Fecha a janela atual
-        self.root.destroy()
-        # Fecha a janela pai (janela de menu)
-        self.parents[0].root.destroy()
+        # Chama a janela de login (passa a janela atual)
+        JanelaLogin(self)
 
     # Fecha o programa
     def sair(self):
         # Fecha a janela atual
         self.root.destroy()
-        # Fecha as janelas antecessoras
-        for parent in self.parents:
-            parent.root.destroy()
 
 
 if __name__ == "__main__":
