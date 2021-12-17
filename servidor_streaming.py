@@ -48,21 +48,28 @@ def audio_stream():
             audio_threads[client_addr].start()
 
 
+#Inicia server
+def inicia_server():
+    while True:
+        print("Aguardando conexão...")
+        mensagem, client = server_socket.recvfrom(BUFFER_SIZE)
+        mensagem = mensagem.decode("utf-8")
+        print(mensagem, client)
+        if client not in threads:
+            threads[client] = ConnectionThread(server_socket, client)
+            threads[client].start()
+        if mensagem.find(".mp4") != -1:
+            threads[client].video = mensagem
+        else:
+            threads[client].mensagem = mensagem
+        if mensagem == mensagens.PARAR_STREAMING:
+            threads[client].stop = True
+
 # Gerando multithreading
 thread_audio = threading.Thread(target=audio_stream, args=())
 thread_audio.start()
 
-while True:
-    print("Aguardando conexão...")
-    mensagem, client = server_socket.recvfrom(BUFFER_SIZE)
-    mensagem = mensagem.decode("utf-8")
-    print(mensagem, client)
-    if client not in threads:
-        threads[client] = ConnectionThread(server_socket, client)
-        threads[client].start()
-    if mensagem.find(".mp4") != -1:
-        threads[client].video = mensagem
-    else:
-        threads[client].mensagem = mensagem
-    if mensagem == mensagens.PARAR_STREAMING:
-        threads[client].stop = True
+thread_server = threading.Thread(target=inicia_server, args=())
+thread_server.start()
+
+

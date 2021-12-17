@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
+import servidor_streaming
 
 # Definição das constantes
 BT_FONT = ('arial', 12, 'bold')
