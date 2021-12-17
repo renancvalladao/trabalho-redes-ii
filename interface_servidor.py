@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import servidor_streaming
+import os
 
 # Definição das constantes
 BT_FONT = ('arial', 12, 'bold')
@@ -57,12 +58,20 @@ class InterfaceServidor:
         # Código para recuperar a lista de vídeos disponíveis no servidor
         # 
 
+        #Pegar lista de vídeos disponíveis
+        #self.videos = listarVideos_servidor(self)
+        lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
+        lista_de_videos_total = list(map(lambda video: video[0:(len(video) - 9)], lista_de_videos_total))
+        lista_de_videos = set()
+        lista_de_videos.update(lista_de_videos_total)
+        self.videos = lista_de_videos
+
         # lista exemplo de vídeos
-        self.videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
-                       "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
-                       "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
-                       "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
-                       "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
+        #self.videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
+        #               "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
+        #               "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
+        #               "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
+        #               "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
 
         # Criação e posicionamento da lista de vídeos disponíveis
         self.lista_videos = ttk.Treeview(self.root, column=("col0", "col1"))
@@ -94,6 +103,15 @@ class InterfaceServidor:
                                 command=self.bt_remove_click,
                                 bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_remove.place(relx=0.55, rely=0.85, relwidth=0.3, relheight=0.05)
+
+
+    def listarVideos_servidor():
+        print("TESTETETETETE")
+        lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
+        lista_de_videos_total = list(map(lambda video: video[0:(len(video) - 9)], lista_de_videos_total))
+        lista_de_videos = set()
+        lista_de_videos.update(lista_de_videos_total)
+        return lista_de_videos
 
     # Função executada ao clicar no botão bt_adiciona
     def bt_adiciona_click(self):
