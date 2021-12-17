@@ -59,12 +59,8 @@ class InterfaceServidor:
         # 
 
         #Pegar lista de vídeos disponíveis
-        #self.videos = listarVideos_servidor(self)
         lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
-        lista_de_videos_total = list(map(lambda video: video[0:(len(video) - 9)], lista_de_videos_total))
-        lista_de_videos = set()
-        lista_de_videos.update(lista_de_videos_total)
-        self.videos = lista_de_videos
+        self.videos = lista_de_videos_total
 
         # lista exemplo de vídeos
         #self.videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
@@ -105,13 +101,6 @@ class InterfaceServidor:
         self.bt_remove.place(relx=0.55, rely=0.85, relwidth=0.3, relheight=0.05)
 
 
-    def listarVideos_servidor():
-        print("TESTETETETETE")
-        lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
-        lista_de_videos_total = list(map(lambda video: video[0:(len(video) - 9)], lista_de_videos_total))
-        lista_de_videos = set()
-        lista_de_videos.update(lista_de_videos_total)
-        return lista_de_videos
 
     # Função executada ao clicar no botão bt_adiciona
     def bt_adiciona_click(self):
