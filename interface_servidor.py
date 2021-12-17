@@ -4,6 +4,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import servidor_streaming
 import os
+import shutil #manipular arquivos
 
 # Definição das constantes
 BT_FONT = ('arial', 12, 'bold')
@@ -108,7 +109,8 @@ class InterfaceServidor:
         # recupera o caminho absoluto do arquivo escolhido
         self.arq_nome = filedialog.askopenfilename(initialdir="./Videos", title="Selecione um arquivo",
                                                    filetypes=(("mp4 files", "*.mp4"), ("all files", "*.*")))
-
+        
+        print(self.arq_nome)
         # Verifica se algum arquivo foi escolhido
         if self.arq_nome:
             # Recupera o nome do arquivo de vídeo escolhido
@@ -125,6 +127,10 @@ class InterfaceServidor:
                 # Código que adiciona o nome do vídeo escolhido
                 # na lista de vídeos do servidor
                 # 
+                local_origem = self.arq_nome
+                local_destino = "./Videos"
+                shutil.copy(local_origem,local_destino) #copiando arquivo pro destino do servidor
+                print("VIDEO_ADICIONADO")
 
             else:
                 # Mensagem de erro
