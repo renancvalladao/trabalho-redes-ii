@@ -57,7 +57,7 @@ class ConnectionThread(threading.Thread):
 
         TS = (0.5 / FPS)
         fps, st, frames_to_count, cnt = (0, 0, 1, 0)
-
+        time.sleep(0.8) #Sleep para equiparar ao sleep do Audio
         while not self.stop:
             try:
                 _, frame = video.read()

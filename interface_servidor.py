@@ -154,6 +154,9 @@ class InterfaceServidor:
             # Código que remove o vídeo selecionado
             # da lista de vídeos do servidor
             # 
+            video_deletar = "./Videos/" + self.video
+            os.remove(video_deletar) #deletando video da pasta
+            print("VIDEO_REMOVIDO")
 
         # Verifica se mais de um vídeo foi selecionado
         elif selecionado:
