@@ -86,7 +86,7 @@ class ConnectionThread(threading.Thread):
                 except:
                     pass
             cnt += 1
-            cv2.imshow('Video Servidor', frame)
+            # cv2.imshow('Video Servidor', frame)
             key = cv2.waitKey(int(1000 * TS)) & 0xFF
             if key == ord('q'):
                 break
