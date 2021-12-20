@@ -96,7 +96,7 @@ class JanelaLogin:
             # Reseta os valores das entrys e radio buttons
             self.ent_usuario.delete(0, END)
             self.tipo.set("Premium")
-            self.ent_end_ip.delete(0, END)
+            # self.ent_end_ip.delete(0, END)
             # Chama a janela de menu (passa a janela atual)
             JanelaMenu(self)
         else:
