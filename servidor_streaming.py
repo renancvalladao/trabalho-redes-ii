@@ -58,11 +58,11 @@ def recebe_video_cliente(mensagem,client):
 # Enviar audio
 def audio_stream():
     audio_threads = {}
-    print('server listening at', (host_ip, (UDP_PORT - 1)))
+    print('(UDP) Ouvindo conexões de audio em:', (host_ip, (UDP_PORT - 1)))
     while True:
-        print("Esperando conexao de audio")
+        print("Esperando conexao de audio...")
         msg, client_addr = audio_socket.recvfrom(BUFFER_SIZE)
-        print('GOT connection from ', client_addr, msg)
+        print('Conexão de audio recebida de ', client_addr, msg)
         thread_audio_cliente = threading.Thread(target=recebe_audio_cliente(msg,client_addr,audio_threads), args=())
         thread_audio_cliente.start()
 

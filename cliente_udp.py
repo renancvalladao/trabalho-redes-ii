@@ -112,7 +112,6 @@ host_ip = getIP()  # Pegar host_ip e host_name dinamicamente
 host_name = getHostName()
 BUFFER_SIZE = 65536
 UDP_PORT = 6000
-BREAK = False
 
 print("Host IP: ", host_ip)
 print("Host Name: ", host_name)
