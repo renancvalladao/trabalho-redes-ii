@@ -58,41 +58,41 @@ class JanelaLogin:
     def criar_widgets(self):
         # Criação e posicionamento do label e entry do nome de usuário
         self.lb_usuario = Label(self.root, text="Usuário", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        self.lb_usuario.place(relx=0.35, rely=0.2)
+        self.lb_usuario.place(relx=0.35, rely=0.29)
         self.ent_usuario = Entry(self.root, font=ENT_FONT)
-        self.ent_usuario.place(relx=0.45, rely=0.205)
+        self.ent_usuario.place(relx=0.45, rely=0.295)
 
         # Criação e posicionamento do label e radio buttons de tipo de usuário
         self.lb_tipo = Label(self.root, text="Tipo", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        self.lb_tipo.place(relx=0.38, rely=0.35)
+        self.lb_tipo.place(relx=0.38, rely=0.42)
         self.tipo = StringVar()
         self.tipo.set("Premium")
         bt_tipo_1 = Radiobutton(self.root, text="Premium", variable=self.tipo, value="Premium",
                                 bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        bt_tipo_1.place(relx=0.45, rely=0.35)
+        bt_tipo_1.place(relx=0.45, rely=0.42)
         bt_tipo_2 = Radiobutton(self.root, text="Convidado", variable=self.tipo, value="Convidado",
                                 bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        bt_tipo_2.place(relx=0.45, rely=0.42)
+        bt_tipo_2.place(relx=0.45, rely=0.49)
 
-        # Criação e posicionamento do label e entry do endereço IP
-        self.lb_end_ip = Label(self.root, text="Endereço IP", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        self.lb_end_ip.place(relx=0.33, rely=0.55)
-        self.ent_end_ip = Entry(self.root, font=ENT_FONT)
-        self.ent_end_ip.place(relx=0.48, rely=0.555)
+        # Criação e posicionamento do label e entry do endereço IP (somente para a parte 2)
+        # self.lb_end_ip = Label(self.root, text="Endereço IP", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        # self.lb_end_ip.place(relx=0.33, rely=0.55)
+        # self.ent_end_ip = Entry(self.root, font=ENT_FONT)
+        # self.ent_end_ip.place(relx=0.48, rely=0.555)
 
         # Criação e posicionamento do botão que faz o login
         bt_entrar = Button(self.root, text="Entrar", font=LB_FONT, bd=BT_BORDER, command=self.bt_entrar_click,
                            bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
-        bt_entrar.place(relx=0.44, rely=0.7, relwidth=0.15, relheight=0.08)
+        bt_entrar.place(relx=0.44, rely=0.62, relwidth=0.15, relheight=0.08)
 
     # Função executada ao clicar no botão bt_entrar
     def bt_entrar_click(self):
         # Recupera os valores de entrada
         usuario = self.ent_usuario.get()
         tipo = self.tipo.get()
-        end_ip = self.ent_end_ip.get()
+        # end_ip = self.ent_end_ip.get()
         # Verifica se todos as entradas estão preenchidas
-        if usuario and tipo and end_ip:
+        if usuario and tipo:
             # Reseta os valores das entrys e radio buttons
             self.ent_usuario.delete(0, END)
             self.tipo.set("Premium")
@@ -171,8 +171,9 @@ class JanelaMenu:
 
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
-        # Chama a janela de catálogo de vídeos (passa a janela atual)
+        # Recupera a lista de vídeos
         lista_de_videos = cliente_udp.listarVideos()
+        # Chama a janela de catálogo de vídeos (passa a janela atual e a lista de vídeos)
         JanelaVideos(self, lista_de_videos)
 
     # Volta para a janela de login
@@ -234,17 +235,6 @@ class JanelaVideos:
 
     # Criação dos widgets
     def criar_widgets(self):
-        # 
-        # Código para recuperar a lista de vídeos disponíveis no servidor
-        # 
-
-        # lista exemplo de vídeos
-        #videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
-        #          "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
-        #          "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
-        #          "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
-        #          "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
-
         # Criação e posicionamento da lista de vídeos disponíveis
         self.lista_videos = ttk.Treeview(self.root, column=("col0", "col1"))
         self.lista_videos.heading("#0", text="")
@@ -344,13 +334,10 @@ class JanelaVideos:
 
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
-        nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
-        cliente_udp.reproduzirVideo(nome_arquivo_video)
         # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
-
-        # 
+        nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
         # Código para pedir o vídeo ao servidor
-        # 
+        cliente_udp.reproduzirVideo(nome_arquivo_video)
 
     # Volta para a janela de menu
     def voltar(self):

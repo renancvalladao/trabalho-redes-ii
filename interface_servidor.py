@@ -55,20 +55,9 @@ class InterfaceServidor:
 
     # Criação dos widgets
     def criar_widgets(self):
-        # 
-        # Código para recuperar a lista de vídeos disponíveis no servidor
-        # 
-
         #Pegar lista de vídeos disponíveis
         lista_de_videos_total = next(os.walk("Videos"), (None, None, []))[2]
         self.videos = lista_de_videos_total
-
-        # lista exemplo de vídeos
-        #self.videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4",
-        #               "video6.mp4", "video7.mp4", "video8.mp4", "video9.mp4", "video10.mp4",
-        #               "video11.mp4", "video12.mp4", "video13.mp4", "video14.mp4", "video15.mp4",
-        #               "video16.mp4", "video17.mp4", "video18.mp4", "video19.mp4", "video20.mp4",
-        #               "video21.mp4", "video22.mp4", "video23.mp4", "video24.mp4", "video25.mp4", ]
 
         # Criação e posicionamento da lista de vídeos disponíveis
         self.lista_videos = ttk.Treeview(self.root, column=("col0", "col1"))
@@ -91,12 +80,12 @@ class InterfaceServidor:
             self.lista_videos.insert("", END, values=video)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
-        self.bt_adiciona = Button(self.root, text="Adiciona vídeo", font=BT_FONT, bd=BT_BORDER,
+        self.bt_adiciona = Button(self.root, text="Adicionar vídeo", font=BT_FONT, bd=BT_BORDER,
                                   command=self.bt_adiciona_click,
                                   bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_adiciona.place(relx=0.15, rely=0.85, relwidth=0.3, relheight=0.05)
 
-        self.bt_remove = Button(self.root, text="Remove vídeo", font=BT_FONT, bd=BT_BORDER,
+        self.bt_remove = Button(self.root, text="Remover vídeo", font=BT_FONT, bd=BT_BORDER,
                                 command=self.bt_remove_click,
                                 bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_remove.place(relx=0.55, rely=0.85, relwidth=0.3, relheight=0.05)
@@ -123,10 +112,7 @@ class InterfaceServidor:
                 # Chama a função que atualiza a lista de vídeos da interface
                 self.atualiza_lista()
 
-                # 
-                # Código que adiciona o nome do vídeo escolhido
-                # na lista de vídeos do servidor
-                # 
+                # Código que adiciona o vídeo no servidor
                 local_origem = self.arq_nome
                 local_destino = "./Videos"
                 shutil.copy(local_origem,local_destino) #copiando arquivo pro destino do servidor
@@ -150,10 +136,7 @@ class InterfaceServidor:
             # Chama a função que atualiza a lista de vídeos da interface
             self.atualiza_lista()
 
-            # 
-            # Código que remove o vídeo selecionado
-            # da lista de vídeos do servidor
-            # 
+            # Código que remove o vídeo no servidor
             video_deletar = "./Videos/" + self.video
             os.remove(video_deletar) #deletando video da pasta
             print("VIDEO_REMOVIDO")
