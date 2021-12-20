@@ -58,9 +58,9 @@ class JanelaLogin:
     def criar_widgets(self):
         # Criação e posicionamento do label e entry do nome de usuário
         self.lb_usuario = Label(self.root, text="Usuário", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        self.lb_usuario.place(relx=0.35, rely=0.29)
+        self.lb_usuario.place(relx=0.345, rely=0.29)
         self.ent_usuario = Entry(self.root, font=ENT_FONT)
-        self.ent_usuario.place(relx=0.45, rely=0.295)
+        self.ent_usuario.place(relx=0.455, rely=0.295)
 
         # Criação e posicionamento do label e radio buttons de tipo de usuário
         self.lb_tipo = Label(self.root, text="Tipo", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
@@ -83,7 +83,7 @@ class JanelaLogin:
         # Criação e posicionamento do botão que faz o login
         bt_entrar = Button(self.root, text="Entrar", font=LB_FONT, bd=BT_BORDER, command=self.bt_entrar_click,
                            bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
-        bt_entrar.place(relx=0.44, rely=0.62, relwidth=0.15, relheight=0.08)
+        bt_entrar.place(relx=0.425, rely=0.62, relwidth=0.15, relheight=0.08)
 
     # Função executada ao clicar no botão bt_entrar
     def bt_entrar_click(self):
