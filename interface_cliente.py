@@ -337,8 +337,7 @@ class JanelaVideos:
         # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
         nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
         # Código para pedir o vídeo ao servidor
-        if not cliente_udp.reproduzirVideo(nome_arquivo_video):
-            messagebox.showerror("ERRO", "Resolução indisponível para esse vídeo")
+        cliente_udp.reproduzirVideo(nome_arquivo_video)
 
     # Volta para a janela de menu
     def voltar(self):

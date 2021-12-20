@@ -33,8 +33,6 @@ def reproduzirVideo(nomeVideo):
     video_mensagem = client_socket.recv(BUFFER_SIZE)
     video_mensagem = video_mensagem.decode("utf-8")
     print(video_mensagem)
-    if video_mensagem == 'VideoNotFound':
-        return False
 
     def receive_video():
         cv2.namedWindow("Video no Cliente")
@@ -95,7 +93,6 @@ def reproduzirVideo(nomeVideo):
     t1.start()
     t2 = threading.Thread(target=receive_video, args=())
     t2.start()
-    return True
 
 
 def listarVideos():
