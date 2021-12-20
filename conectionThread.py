@@ -44,15 +44,18 @@ class ConnectionThread(threading.Thread):
     def reproduzirVideo(self):
         nomeVideo = self.video[0:(len(self.video)-9)]
         resolucao = self.video[(len(self.video)-8):(len(self.video)-4)]
-        mensagem_video = "REPRODUZINDO O VÍDEO " + nomeVideo + ", COM RESOLUÇÃO " + resolucao
-        self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
+
         # Fila 'q' dos frames
         q = queue.Queue(maxsize=10)
 
         # Tratando Vídeo
         video = cv2.VideoCapture("./Videos/" + self.video)  # Captura do vídeo
         FPS = video.get(cv2.CAP_PROP_FPS)  # Pegando FPS do video original
-
+        if FPS == 0:
+            self.server_socket.sendto(b'VideoNotFound', self.client)
+            return
+        mensagem_video = "REPRODUZINDO O VÍDEO " + nomeVideo + ", COM RESOLUÇÃO " + resolucao
+        self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
         WIDTH = 400  # Caber em um único datagrama
 
         TS = (0.5 / FPS)
