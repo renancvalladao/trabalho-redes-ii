@@ -110,11 +110,13 @@ class JanelaLogin:
 
 
 class JanelaMenu:
-    def __init__(self, parent):
+    def __init__(self, parent, grupo=False):
         # Fecha a janela anterior
         parent.root.destroy()
         # Cria a janela de menu
         self.root = Tk()
+
+        self.grupo = grupo
 
         # Configurações básicas da janela
         self.root.title("Menu")
@@ -154,8 +156,12 @@ class JanelaMenu:
     # Criação dos widgets
     def criar_widgets(self):
         # Criação e posicionamento do botão que cria um grupo (parte 2 do trabalho)
-        self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, command=self.bt_grupo_click,
-                               bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        if self.grupo:
+            self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
+                                   command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        else:
+            self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, 
+                                   command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
         # Criação e posicionamento do botão que acessa o catálogo de vídeos
@@ -166,15 +172,188 @@ class JanelaMenu:
 
     # Função executada ao clicar no botão bt_grupo
     def bt_grupo_click(self):
-        # Somente para a parte 2 do trabalho
-        pass
+        if not self.grupo:
+            self.grupo = True
+            self.bt_grupo.destroy()
+            self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
+                                   command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+            self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
+        else:
+            # Chama a janela de catálogo de vídeos (passa a janela atual)
+            JanelaGrupo(self)
+
 
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
         # Recupera a lista de vídeos
         lista_de_videos = cliente_udp.listarVideos()
         # Chama a janela de catálogo de vídeos (passa a janela atual e a lista de vídeos)
-        JanelaVideos(self, lista_de_videos)
+        JanelaVideos(self, lista_de_videos, self.grupo)
+
+    # Volta para a janela de login
+    def logout(self):
+        # Chama a janela de login (passa a janela atual)
+        JanelaLogin(self)
+
+    # Fecha o programa
+    def sair(self):
+        # Fecha a janela atual
+        self.root.destroy()
+
+
+class JanelaGrupo:
+    def __init__(self, parent):
+        # Fecha a janela anterior
+        parent.root.destroy()
+        # Cria a janela de catálogo de vídeos
+        self.root = Tk()
+
+        # Configurações básicas da janela
+        self.root.title("Grupo")
+        self.root.configure(background=WINDOW_COLOR)
+        self.root.geometry("700x550+280+50")
+        self.root.maxsize(width=800, height=600)
+        self.root.minsize(width=600, height=500)
+
+        # Criação dos componentes da janela
+        self.criar_menubar()
+        self.criar_frame()
+        self.criar_widgets()
+
+        # Define uma função a ser executada ao fechar a janela
+        self.root.protocol("WM_DELETE_WINDOW", self.sair)
+        # Criação do loop da janela
+        self.root.mainloop()
+
+    # Criação da barra de menu
+    def criar_menubar(self):
+        menubar = Menu(self.root)
+        self.root.config(menu=menubar)
+        opcoes = Menu(menubar)
+
+        menubar.add_cascade(label="Opções", menu=opcoes)
+
+        # Opção que volta para a janela de menu
+        opcoes.add_command(label="Voltar", command=self.voltar)
+        # Opção que volta para a janela de login
+        opcoes.add_command(label="Logout", command=self.logout)
+        # Opção que fecha o programa
+        opcoes.add_command(label="Sair", command=self.sair)
+
+    # Criação do frame
+    def criar_frame(self):
+        self.frame = Frame(self.root, bg=BACKGROUND_COLOR)
+        self.frame.place(relx=0.05, rely=0.05, relwidth=0.9, relheight=0.9)
+
+    # Criação dos widgets
+    def criar_widgets(self):
+        # 
+        # Código para recuperar o ID dos membros do grupo no servidor
+        # 
+
+        # lista exemplo de membros
+        self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
+                        "nome6", "nome7", "nome8", "nome9", "nome10",
+                        "nome11", "nome12", "nome13", "nome14", "nome15"]
+
+        # Criação e posicionamento da entry para adicionar um membro
+        self.ent_adiciona = Entry(self.root, font=ENT_FONT)
+        self.ent_adiciona.place(relx=0.25, rely=0.105, relwidth=0.22)
+        # Criação e posicionamento do botão para adicionar um membro
+        self.bt_adiciona = Button(self.root, text="Adicionar membro", font=LB_FONT, bd=BT_BORDER,
+                                  command=self.bt_adiciona_click,
+                                  bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        self.bt_adiciona.place(relx=0.472, rely=0.1, relwidth=0.28, relheight=0.05)
+
+        # Criação e posicionamento da lista de membros do grupo
+        self.lista_membros = ttk.Treeview(self.root, column=("col0", "col1"))
+        self.lista_membros.heading("#0", text="")
+        self.lista_membros.heading("#1", text="Membros do grupo")
+        self.lista_membros.column("#0", width=1)
+        self.lista_membros.column("#1", width=500)
+        self.lista_membros.place(relx=0.1, rely=0.23, relwidth=0.77, relheight=0.54)
+
+        # Criação e posicionamento da barra de rolamento
+        self.scroll_lista = Scrollbar(self.root, orient='vertical')
+        self.scroll_lista.place(relx=0.87, rely=0.23, relheight=0.54)
+
+        # Conecta a barra de rolamento com a lista de membros
+        self.scroll_lista['command'] = self.lista_membros.yview
+        self.lista_membros.configure(yscroll=self.scroll_lista.set)
+
+        # Insere os membros do grupo na lista
+        for membro in self.membros:
+            self.lista_membros.insert("", END, values=membro)
+
+        # Criação e posicionamento do botão para remover o membro selecionado
+        self.bt_remove = Button(self.root, text="Remover membro", font=LB_FONT, bd=BT_BORDER,
+                                command=self.bt_remove_click,
+                                bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+        self.bt_remove.place(relx=0.35, rely=0.85, relwidth=0.3, relheight=0.05)
+
+    # Função executada ao clicar no botão bt_adiciona
+    def bt_adiciona_click(self):
+        # Recupera o valor da entry para adicionar um membro
+        nome = self.ent_adiciona.get()
+        # Verifica se algo foi digitado na entry
+        if nome:
+            # Verifica se o usuário já é um membro do grupo
+            if nome not in self.membros:
+                # 
+                # Código para adicionar o usuário no grupo no 
+                # servidor gerenciador de serviços
+                # 
+
+                # Adiciona o nome do vídeo na lista de vídeos da interface
+                self.membros.append(nome)
+                # Chama a função que atualiza a lista de vídeos da interface
+                self.atualiza_lista()
+            else:
+                # Mensagem de erro
+                messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
+        else:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Digite o nome de usuário\nque você deseja adicionar")
+
+    # Função executada ao clicar no botão bt_remove
+    def bt_remove_click(self):
+        # Recupera o membro selecionado
+        selecionado = self.lista_membros.selection()
+        # Verifica se somente um membro foi selecionado
+        if len(selecionado) == 1:
+            # Recupera o nome do membro selecionado
+            membro = self.lista_membros.item(selecionado, 'values')[0]
+
+            # Remove o membro selecionado da lista de membros
+            self.membros.remove(membro)
+            # Chama a função que atualiza a lista de membros na interface
+            self.atualiza_lista()
+
+            # 
+            # Código que remove o membro do grupo no servidor
+            # 
+
+        # Verifica se mais de um membro foi selecionado
+        elif selecionado:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Selecione somente um membro")
+        # Verifica se nenhum membro foi selecionado
+        else:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Selecione o membro que\nvocê deseja remover")
+
+    # Função que atualiza a lista de membros na interface
+    def atualiza_lista(self):
+        # Deleta as informações antigas
+        self.lista_membros.delete(*self.lista_membros.get_children())
+        # Insere as informações atualizadas
+        for membro in self.membros:
+            self.lista_membros.insert("", END, values=membro)
+
+    # Volta para a janela de menu
+    def voltar(self):
+        # Chama a janela de menu (passa a janela atual)
+        JanelaMenu(self, True)
 
     # Volta para a janela de login
     def logout(self):
@@ -188,13 +367,14 @@ class JanelaMenu:
 
 
 class JanelaVideos:
-    def __init__(self, parent, lista_de_videos):
+    def __init__(self, parent, lista_de_videos, grupo):
         # Fecha a janela anterior
         parent.root.destroy()
         # Cria a janela de catálogo de vídeos
         self.root = Tk()
 
         self.lista_de_videos = lista_de_videos
+        self.grupo = grupo
 
         # Configurações básicas da janela
         self.root.title("Catálogo de vídeos")
@@ -241,11 +421,11 @@ class JanelaVideos:
         self.lista_videos.heading("#1", text="Catálogo de vídeos")
         self.lista_videos.column("#0", width=1)
         self.lista_videos.column("#1", width=500)
-        self.lista_videos.place(relx=0.06, rely=0.065, relwidth=0.85, relheight=0.75)
+        self.lista_videos.place(relx=0.06, rely=0.065, relwidth=0.85, relheight=0.435)
 
         # Criação e posicionamento da barra de rolamento
         self.scroll_lista = Scrollbar(self.root, orient='vertical')
-        self.scroll_lista.place(relx=0.91, rely=0.065, relheight=0.75)
+        self.scroll_lista.place(relx=0.91, rely=0.065, relheight=0.385)
 
         # Conecta a barra de rolamento com a lista de vídeos
         self.scroll_lista['command'] = self.lista_videos.yview
@@ -254,6 +434,33 @@ class JanelaVideos:
         # Insere os vídeos disponíveis no servidor na lista
         for video in self.lista_de_videos:
             self.lista_videos.insert("", END, values=video)
+
+        # Criação e posicionamento do label e radio buttons de resolução so vídeo
+        self.lb_resolucao = Label(self.root, text="Resolução:", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        self.lb_resolucao.place(relx=0.26, rely=0.58)
+        self.resolucao = StringVar()
+        self.resolucao.set("240p")
+        bt_resolucao_1 = Radiobutton(self.root, text="240p", variable=self.resolucao, value="240p",
+                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        bt_resolucao_1.place(relx=0.41, rely=0.58)
+        bt_resolucao_2 = Radiobutton(self.root, text="480p", variable=self.resolucao, value="480p",
+                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        bt_resolucao_2.place(relx=0.53, rely=0.58)
+        bt_resolucao_3 = Radiobutton(self.root, text="720p", variable=self.resolucao, value="720p",
+                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        bt_resolucao_3.place(relx=0.65, rely=0.58)
+
+        # Criação e posicionamento do label e radio buttons de tipo de streaming
+        self.lb_streaming = Label(self.root, text="Streaming:", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        self.lb_streaming.place(relx=0.28, rely=0.7)
+        self.streaming = StringVar()
+        self.streaming.set("Individual")
+        bt_streaming_1 = Radiobutton(self.root, text="Individual", variable=self.streaming, value="Individual",
+                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        bt_streaming_1.place(relx=0.43, rely=0.7)
+        bt_streaming_2 = Radiobutton(self.root, text="Grupo", variable=self.streaming, value="Grupo",
+                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+        bt_streaming_2.place(relx=0.6, rely=0.7)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
         self.bt_assistir = Button(self.root, text="Assistir vídeo", font=LB_FONT, bd=BT_BORDER,
@@ -266,83 +473,32 @@ class JanelaVideos:
         # Recupera o vídeo selecionado
         selecionado = self.lista_videos.selection()
         # Verifica se algum vídeo foi selecionado
-        if selecionado:
+        if len(selecionado) == 1:
             # Recupera o nome do arquivo do vídeo selecionado
             self.video = self.lista_videos.item(selecionado, 'values')[0]
-
-            # Cria uma janela para a escolha da resolução
-            self.janela_resolucao = Toplevel()
-
-            # Configurações básicas da janela
-            self.janela_resolucao.title("Resolução")
-            self.janela_resolucao.configure(background='#151515')
-            self.janela_resolucao.geometry("350x275+520+175")
-            # Impede que a janela seja redimensionada
-            self.janela_resolucao.resizable(False, False)
-            # Garante que a janela pai não possa ser
-            # alcançada enquanto esta estiver aberta
-            self.janela_resolucao.focus_force()
-            self.janela_resolucao.grab_set()
-
-            # Criação e posicionamento do botão que define resolução como 240p
-            self.bt_res_240 = Button(self.janela_resolucao, text="240p", font=LB_FONT, bd=BT_BORDER,
-                                     command=self.bt_res_240_click,
-                                     bg='gray35', fg=BT_FOREGROUND_COLOR)
-            self.bt_res_240.place(relx=0.35, rely=0.18, relwidth=0.3, relheight=0.15)
-
-            # Criação e posicionamento do botão que define resolução como 480p
-            self.bt_res_480 = Button(self.janela_resolucao, text="480p", font=LB_FONT, bd=BT_BORDER,
-                                     command=self.bt_res_480_click,
-                                     bg='gray35', fg=BT_FOREGROUND_COLOR)
-            self.bt_res_480.place(relx=0.35, rely=0.43, relwidth=0.3, relheight=0.15)
-
-            # Criação e posicionamento do botão que define resolução como 720p
-            self.bt_res_720 = Button(self.janela_resolucao, text="720p", font=LB_FONT, bd=BT_BORDER,
-                                     command=self.bt_res_720_click,
-                                     bg='gray35', fg=BT_FOREGROUND_COLOR)
-            self.bt_res_720.place(relx=0.35, rely=0.68, relwidth=0.3, relheight=0.15)
-
-            # Criação do loop da janela
-            self.janela_resolucao.mainloop()
-
-    # Função executada ao clicar no botão bt_res_240
-    def bt_res_240_click(self):
-        # Define resolução do vídeo
-        self.resolucao = "240"
-        # Fecha a janela de resolução
-        self.janela_resolucao.destroy()
-        # Chama a função que pede o vídeo ao servidor
-        self.assistir_video()
-
-    # Função executada ao clicar no botão bt_res_480
-    def bt_res_480_click(self):
-        # Define resolução do vídeo
-        self.resolucao = "480"
-        # Fecha a janela de resolução
-        self.janela_resolucao.destroy()
-        # Chama a função que pede o vídeo ao servidor
-        self.assistir_video()
-
-    # Função executada ao clicar no botão bt_res_720
-    def bt_res_720_click(self):
-        # Define resolução do vídeo
-        self.resolucao = "720"
-        # Fecha a janela de resolução
-        self.janela_resolucao.destroy()
-        # Chama a função que pede o vídeo ao servidor
-        self.assistir_video()
-
+            # Chama a função que pede o vídeo ao servidor
+            self.assistir_video()
+        # Verifica se mais de um vídeo foi selecionado
+        elif selecionado:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Selecione somente um vídeo")
+        # Verifica se nenhum vídeo foi selecionado
+        else:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Selecione o vídeo que\nvocê deseja assistir")
+    
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
-        # self.video = nome do arquivo do vídeo, self.resolucao = resolução do vídeo
-        nome_arquivo_video = self.video + "_" + self.resolucao + "p.mp4"
+        # self.video = nome do arquivo do vídeo, self.resolucao.get() = resolução do vídeo, 
+        # self.streaming.get() = tipo de streaming
+        nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
         # Código para pedir o vídeo ao servidor
         cliente_udp.reproduzirVideo(nome_arquivo_video)
 
     # Volta para a janela de menu
     def voltar(self):
         # Chama a janela de menu (passa a janela atual)
-        JanelaMenu(self)
+        JanelaMenu(self, self.grupo)
 
     # Volta para a janela de login
     def logout(self):

@@ -79,18 +79,16 @@ class InterfaceServidor:
         for video in self.videos:
             self.lista_videos.insert("", END, values=video)
 
-        # Criação e posicionamento do botão para assistir o vídeo selecionado
+        # Criação e posicionamento do botão para adicionar um vídeo
         self.bt_adiciona = Button(self.root, text="Adicionar vídeo", font=BT_FONT, bd=BT_BORDER,
                                   command=self.bt_adiciona_click,
                                   bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_adiciona.place(relx=0.15, rely=0.85, relwidth=0.3, relheight=0.05)
-
+        # Criação e posicionamento do botão para remover o vídeo selecionado
         self.bt_remove = Button(self.root, text="Remover vídeo", font=BT_FONT, bd=BT_BORDER,
                                 command=self.bt_remove_click,
                                 bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
         self.bt_remove.place(relx=0.55, rely=0.85, relwidth=0.3, relheight=0.05)
-
-
 
     # Função executada ao clicar no botão bt_adiciona
     def bt_adiciona_click(self):
@@ -120,7 +118,7 @@ class InterfaceServidor:
 
             else:
                 # Mensagem de erro
-                messagebox.showinfo("VIDEO NÃO ADICIONADO", "Já existe um vídeo com \neste nome no servidor")
+                messagebox.showinfo("VIDEO NÃO ADICIONADO", "Já existe um vídeo com\neste nome no servidor")
 
     # Função executada ao clicar no botão bt_remove
     def bt_remove_click(self):
@@ -145,6 +143,10 @@ class InterfaceServidor:
         elif selecionado:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Selecione somente um vídeo")
+        # Verifica se nenhum vídeo foi selecionado
+        else:
+            # Mensagem de erro
+            messagebox.showerror("ERRO", "Selecione o vídeo que\nvocê deseja remover")
 
     # Função que atualiza a lista de vídeos da interface
     def atualiza_lista(self):
