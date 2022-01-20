@@ -91,14 +91,43 @@ class JanelaLogin:
         usuario = self.ent_usuario.get()
         tipo = self.tipo.get()
         # end_ip = self.ent_end_ip.get()
+
         # Verifica se todos as entradas estão preenchidas
         if usuario and tipo:
-            # Reseta os valores das entrys e radio buttons
-            self.ent_usuario.delete(0, END)
-            self.tipo.set("Premium")
-            # self.ent_end_ip.delete(0, END)
-            # Chama a janela de menu (passa a janela atual)
-            JanelaMenu(self)
+            #Validar se usuário existe na pasta Usuarios
+            if tipo == "Premium":
+                arqUsuario = open("./Usuarios/premium.txt")
+            else:
+                arqUsuario = open("./Usuarios/convidado.txt")
+
+            linhas = arqUsuario.readlines()
+            userValido = False
+            tamanhoArq = len(linhas)
+            linhasPercorridas = 1
+
+            for linha in linhas:
+                print(linhasPercorridas)
+                linha_sem_barra_n = linha[0:len(linha)-1]
+
+                if linhasPercorridas == tamanhoArq:
+                    linha_sem_barra_n = linha[0:len(linha)]
+
+                if linha_sem_barra_n == usuario: 
+                    userValido = True
+                    break
+                linhasPercorridas += 1
+                
+            if(userValido == False):
+                errorText = "Usuário " + usuario + " categoria " + tipo + "\nnão encontrado!"
+                messagebox.showerror("ERRO", errorText)
+                #messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
+            else:
+                # Reseta os valores das entrys e radio buttons
+                self.ent_usuario.delete(0, END)
+                self.tipo.set("Premium")
+                # self.ent_end_ip.delete(0, END)
+                # Chama a janela de menu (passa a janela atual)
+                JanelaMenu(self)
         else:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
