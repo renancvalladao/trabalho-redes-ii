@@ -13,6 +13,7 @@ BT_BACKGROUND_COLOR = '#103d72'
 BT_FOREGROUND_COLOR = 'white'
 BT_BORDER = 3
 
+nome_usuario = ''
 
 class JanelaLogin:
     def __init__(self, parent=None):
@@ -90,6 +91,8 @@ class JanelaLogin:
         # Recupera os valores de entrada
         usuario = self.ent_usuario.get()
         tipo = self.tipo.get()
+        nome_usuario = usuario
+        print("nome usuario no login= ",nome_usuario)
         # end_ip = self.ent_end_ip.get()
 
         # Verifica se todos as entradas estão preenchidas
@@ -106,7 +109,6 @@ class JanelaLogin:
             linhasPercorridas = 1
 
             for linha in linhas:
-                print(linhasPercorridas)
                 linha_sem_barra_n = linha[0:len(linha)-1]
 
                 if linhasPercorridas == tamanhoArq:
@@ -279,7 +281,7 @@ class JanelaGrupo:
         # 
         # Código para recuperar o ID dos membros do grupo no servidor
         # 
-
+        print("nome_usuario grupo=",nome_usuario)
         # lista exemplo de membros
         self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
                         "nome6", "nome7", "nome8", "nome9", "nome10",
