@@ -13,7 +13,9 @@ BT_BACKGROUND_COLOR = '#103d72'
 BT_FOREGROUND_COLOR = 'white'
 BT_BORDER = 3
 
-nome_usuario = ''
+# Variaveis globais
+global usuario_logado
+global tipo_usuario_logado
 
 class JanelaLogin:
     def __init__(self, parent=None):
@@ -91,8 +93,14 @@ class JanelaLogin:
         # Recupera os valores de entrada
         usuario = self.ent_usuario.get()
         tipo = self.tipo.get()
-        nome_usuario = usuario
-        print("nome usuario no login= ",nome_usuario)
+
+        #Setando usuario logado e tipo globalmente
+        global usuario_logado 
+        global tipo_usuario_logado
+
+        usuario_logado = usuario
+        tipo_usuario_logado = tipo
+
         # end_ip = self.ent_end_ip.get()
 
         # Verifica se todos as entradas estão preenchidas
@@ -104,6 +112,8 @@ class JanelaLogin:
                 arqUsuario = open("./Usuarios/convidado.txt")
 
             linhas = arqUsuario.readlines()
+            arqUsuario.close()
+
             userValido = False
             tamanhoArq = len(linhas)
             linhasPercorridas = 1
@@ -186,6 +196,14 @@ class JanelaMenu:
 
     # Criação dos widgets
     def criar_widgets(self):
+        #Verifica se grupo ja existe (Verifica se o arquivo no nome do usuario premium logado existe)
+        try:
+            with open("./Grupos/" + usuario_logado + ".txt","r") as f:
+                self.grupo = True
+                f.close()
+        except IOError:
+            self.grupo = False
+
         # Criação e posicionamento do botão que cria um grupo (parte 2 do trabalho)
         if self.grupo:
             self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
@@ -193,6 +211,7 @@ class JanelaMenu:
         else:
             self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, 
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+
         self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
         # Criação e posicionamento do botão que acessa o catálogo de vídeos
@@ -209,6 +228,17 @@ class JanelaMenu:
             self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
+            print("Apos clicar criar grupo")
+            arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
+            arqGrupo.write(usuario_logado)
+            arqGrupo.write("\n")
+            arqGrupo.close()
+
+            #Para adicionar novos membros    
+            #arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
+            #arqGrupo.write("abc")
+            #arqGrupo.close()
+
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
             JanelaGrupo(self)
@@ -281,7 +311,8 @@ class JanelaGrupo:
         # 
         # Código para recuperar o ID dos membros do grupo no servidor
         # 
-        print("nome_usuario grupo=",nome_usuario)
+        global usuario_logado
+        print("usuario_logado=",usuario_logado)
         # lista exemplo de membros
         self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
                         "nome6", "nome7", "nome8", "nome9", "nome10",
