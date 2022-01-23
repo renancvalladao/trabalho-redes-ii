@@ -23,31 +23,22 @@ def entrarNaApp(mensagem):
     arqUsuario.close()
 
     userValido = False
-    tamanhoArq = len(linhas)
-    linhasPercorridas = 1
-
-    id_usuario = -1
-    print(linhas)
 
     for linha in linhas:
         linha_sem_barra_n = linha[0:len(linha)-1]
 
-        print(linha_sem_barra_n.split(" ")[1], usuario)
-        print(linha_sem_barra_n.split(" ")[1] == usuario)
-        if linha_sem_barra_n.split(" ")[1] == usuario:
-            id_usuario = linha_sem_barra_n.split(" ")[0]
-            tipo = linha_sem_barra_n.split(" ")[2]
+        if linha_sem_barra_n.split(" ")[0] == usuario:
+            tipo = linha_sem_barra_n.split(" ")[1]
             userValido = True
             break
-        linhasPercorridas += 1
 
     if not userValido:
         arqUsuario = open("Usuarios/usuarios.txt", "a")
-        novoUsuario = str(tamanhoArq) + " " + usuario + " " + tipo + "\n"
+        novoUsuario = usuario + " " + tipo + "\n"
         arqUsuario.write(novoUsuario)
         conn.sendall(mensagens.ENTRAR_NA_APP_ACK.encode("utf-8"))
     else:
-        mensagem = mensagens.STATUS_DO_USUARIO + "," + str(id_usuario) + "," + tipo
+        mensagem = mensagens.STATUS_DO_USUARIO + "," + usuario + "," + tipo
         conn.sendall(mensagem.encode("utf-8"))
 
 
