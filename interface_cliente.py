@@ -535,12 +535,13 @@ class JanelaVideos:
         bt_resolucao_1 = Radiobutton(self.root, text="240p", variable=self.resolucao, value="240p",
                                 bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
         bt_resolucao_1.place(relx=0.41, rely=0.58)
-        bt_resolucao_2 = Radiobutton(self.root, text="480p", variable=self.resolucao, value="480p",
-                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        bt_resolucao_2.place(relx=0.53, rely=0.58)
-        bt_resolucao_3 = Radiobutton(self.root, text="720p", variable=self.resolucao, value="720p",
-                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        bt_resolucao_3.place(relx=0.65, rely=0.58)
+        if tipo_usuario_logado == "Premium":
+            bt_resolucao_2 = Radiobutton(self.root, text="480p", variable=self.resolucao, value="480p",
+                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+            bt_resolucao_2.place(relx=0.53, rely=0.58)
+            bt_resolucao_3 = Radiobutton(self.root, text="720p", variable=self.resolucao, value="720p",
+                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+            bt_resolucao_3.place(relx=0.65, rely=0.58)
 
         # Criação e posicionamento do label e radio buttons de tipo de streaming
         self.lb_streaming = Label(self.root, text="Streaming:", bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
@@ -550,9 +551,10 @@ class JanelaVideos:
         bt_streaming_1 = Radiobutton(self.root, text="Individual", variable=self.streaming, value="Individual",
                                 bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
         bt_streaming_1.place(relx=0.43, rely=0.7)
-        bt_streaming_2 = Radiobutton(self.root, text="Grupo", variable=self.streaming, value="Grupo",
-                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
-        bt_streaming_2.place(relx=0.6, rely=0.7)
+        if tipo_usuario_logado == "Premium":
+            bt_streaming_2 = Radiobutton(self.root, text="Grupo", variable=self.streaming, value="Grupo",
+                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+            bt_streaming_2.place(relx=0.6, rely=0.7)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
         self.bt_assistir = Button(self.root, text="Assistir vídeo", font=LB_FONT, bd=BT_BORDER,
