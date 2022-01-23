@@ -312,11 +312,24 @@ class JanelaGrupo:
         # Código para recuperar o ID dos membros do grupo no servidor
         # 
         global usuario_logado
-        print("usuario_logado=",usuario_logado)
+        arqGrupo = open("./Grupos/" + usuario_logado + ".txt")
+        linhas = arqGrupo.readlines()
+        arqGrupo.close()
+
+        tamanhoArq = len(linhas)
+        linhasPercorridas = 1
+        self.membros = []
+
+        for linha in linhas:
+            linha_sem_barra_n = linha[0:len(linha)-1]
+
+            self.membros.append(linha_sem_barra_n)
+            linhasPercorridas += 1
+
         # lista exemplo de membros
-        self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
-                        "nome6", "nome7", "nome8", "nome9", "nome10",
-                        "nome11", "nome12", "nome13", "nome14", "nome15"]
+        #self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
+        #                "nome6", "nome7", "nome8", "nome9", "nome10",
+        #                "nome11", "nome12", "nome13", "nome14", "nome15"]
 
         # Criação e posicionamento da entry para adicionar um membro
         self.ent_adiciona = Entry(self.root, font=ENT_FONT)
@@ -394,6 +407,14 @@ class JanelaGrupo:
             # 
             # Código que remove o membro do grupo no servidor
             # 
+            arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
+
+            for membro in self.membros:
+                arqGrupo.write(membro)
+                arqGrupo.write("\n")
+
+            arqGrupo.close()
+            print("MEMBRO_REMOVIDO")
 
         # Verifica se mais de um membro foi selecionado
         elif selecionado:
