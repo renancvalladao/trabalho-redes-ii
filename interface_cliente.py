@@ -232,12 +232,11 @@ class JanelaMenu:
             self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
-            print("Apos clicar criar grupo")
             arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
             arqGrupo.write(usuario_logado)
             arqGrupo.write("\n")
             arqGrupo.close()
-
+            print("GRUPO_CRIADO")
             #Para adicionar novos membros    
             #arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
             #arqGrupo.write("abc")
@@ -390,6 +389,7 @@ class JanelaGrupo:
                 self.membros.append(nome)
                 # Chama a função que atualiza a lista de vídeos da interface
                 self.atualiza_lista()
+                print("MEMBRO_ADICIONADO")
             else:
                 # Mensagem de erro
                 messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
