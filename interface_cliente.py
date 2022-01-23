@@ -114,6 +114,7 @@ class JanelaLogin:
                 messagebox.showinfo("Status", "Usuário criado com sucesso!")
             elif resp[0] == mensagens.STATUS_DO_USUARIO:
                 messagebox.showinfo("Status", "ID: " + resp[1] + "\n" + "Tipo: " + resp[2])
+                tipo_usuario_logado = resp[2]
             # Reseta os valores das entrys e radio buttons
             self.ent_usuario.delete(0, END)
             self.tipo.set("Premium")

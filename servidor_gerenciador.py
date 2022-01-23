@@ -17,10 +17,7 @@ def entrarNaApp(mensagem):
     tipo = mensagem[2]
     ip = mensagem[3]
 
-    if tipo == "Premium":
-        arqUsuario = open("./Usuarios/premium.txt")
-    else:
-        arqUsuario = open("./Usuarios/convidado.txt")
+    arqUsuario = open("Usuarios/usuarios.txt")
 
     linhas = arqUsuario.readlines()
     arqUsuario.close()
@@ -38,18 +35,15 @@ def entrarNaApp(mensagem):
         print(linha_sem_barra_n.split(" ")[1], usuario)
         print(linha_sem_barra_n.split(" ")[1] == usuario)
         if linha_sem_barra_n.split(" ")[1] == usuario:
-            print("dentro")
             id_usuario = linha_sem_barra_n.split(" ")[0]
+            tipo = linha_sem_barra_n.split(" ")[2]
             userValido = True
             break
         linhasPercorridas += 1
 
     if not userValido:
-        if tipo == "Premium":
-            arqUsuario = open("./Usuarios/premium.txt", "a")
-        else:
-            arqUsuario = open("./Usuarios/convidado.txt", "a")
-        novoUsuario = str(tamanhoArq) + " " + usuario + "\n"
+        arqUsuario = open("Usuarios/usuarios.txt", "a")
+        novoUsuario = str(tamanhoArq) + " " + usuario + " " + tipo + "\n"
         arqUsuario.write(novoUsuario)
         conn.sendall(mensagens.ENTRAR_NA_APP_ACK.encode("utf-8"))
     else:
