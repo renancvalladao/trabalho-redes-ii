@@ -406,23 +406,25 @@ class JanelaGrupo:
             # Recupera o nome do membro selecionado
             membro = self.lista_membros.item(selecionado, 'values')[0]
 
-            # Remove o membro selecionado da lista de membros
-            self.membros.remove(membro)
-            # Chama a função que atualiza a lista de membros na interface
-            self.atualiza_lista()
+            if membro != usuario_logado:
+                # Remove o membro selecionado da lista de membros
+                self.membros.remove(membro)
+                # Chama a função que atualiza a lista de membros na interface
+                self.atualiza_lista()
 
-            # 
-            # Código que remove o membro do grupo no servidor
-            # 
-            arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
+                #
+                # Código que remove o membro do grupo no servidor
+                #
+                arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
 
-            for membro in self.membros:
-                arqGrupo.write(membro)
-                arqGrupo.write("\n")
+                for membro in self.membros:
+                    arqGrupo.write(membro)
+                    arqGrupo.write("\n")
 
-            arqGrupo.close()
-            print("MEMBRO_REMOVIDO")
-
+                arqGrupo.close()
+                print("MEMBRO_REMOVIDO")
+            else:
+                messagebox.showerror("ERRO", "Você não pode se remover")
         # Verifica se mais de um membro foi selecionado
         elif selecionado:
             # Mensagem de erro
