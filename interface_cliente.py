@@ -196,29 +196,33 @@ class JanelaMenu:
 
     # Criação dos widgets
     def criar_widgets(self):
-        #Verifica se grupo ja existe (Verifica se o arquivo no nome do usuario premium logado existe)
-        try:
-            with open("./Grupos/" + usuario_logado + ".txt","r") as f:
-                self.grupo = True
-                f.close()
-        except IOError:
-            self.grupo = False
+        if tipo_usuario_logado == "Premium":
+            #Verifica se grupo ja existe (Verifica se o arquivo no nome do usuario premium logado existe)
+            try:
+                with open("./Grupos/" + usuario_logado + ".txt","r") as f:
+                    self.grupo = True
+                    f.close()
+            except IOError:
+                self.grupo = False
 
-        # Criação e posicionamento do botão que cria um grupo (parte 2 do trabalho)
-        if self.grupo:
-            self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
-                                   command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
-        else:
-            self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, 
-                                   command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
-
-        self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
+            # Criação e posicionamento do botão que cria um grupo (parte 2 do trabalho)
+            if self.grupo:
+                self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
+                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+            else:
+                self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, 
+                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+            self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
         # Criação e posicionamento do botão que acessa o catálogo de vídeos
         self.bt_videos = Button(self.root, text="Catálogo de vídeos", font=LB_FONT, bd=BT_BORDER,
                                 command=self.bt_videos_click,
                                 bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
-        self.bt_videos.place(relx=0.35, rely=0.6, relwidth=0.3, relheight=0.15)
+
+        if tipo_usuario_logado == "Premium":                        
+            self.bt_videos.place(relx=0.35, rely=0.6, relwidth=0.3, relheight=0.15)
+        else:
+            self.bt_videos.place(relx=0.35, rely=0.35, relwidth=0.3, relheight=0.15)
 
     # Função executada ao clicar no botão bt_grupo
     def bt_grupo_click(self):
@@ -378,7 +382,10 @@ class JanelaGrupo:
                 # Código para adicionar o usuário no grupo no 
                 # servidor gerenciador de serviços
                 # 
-
+                arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
+                arqGrupo.write(nome)
+                arqGrupo.write("\n")
+                arqGrupo.close()                
                 # Adiciona o nome do vídeo na lista de vídeos da interface
                 self.membros.append(nome)
                 # Chama a função que atualiza a lista de vídeos da interface
