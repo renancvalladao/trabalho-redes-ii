@@ -1,30 +1,89 @@
 import socket
 import threading
 
-HOST = '127.0.0.1'
-PORT = 5000
+import mensagens
 
-#Servidor Gerenciador na porta 5000
+
+def getIP():
+    return socket.gethostbyname(socket.gethostname())
+
+
+def getHostName():
+    return socket.gethostname()
+
+
+def entrarNaApp(mensagem):
+    usuario = mensagem[1]
+    tipo = mensagem[2]
+    ip = mensagem[3]
+
+    if tipo == "Premium":
+        arqUsuario = open("./Usuarios/premium.txt")
+    else:
+        arqUsuario = open("./Usuarios/convidado.txt")
+
+    linhas = arqUsuario.readlines()
+    arqUsuario.close()
+
+    userValido = False
+    tamanhoArq = len(linhas)
+    linhasPercorridas = 1
+
+    id_usuario = -1
+    print(linhas)
+
+    for linha in linhas:
+        linha_sem_barra_n = linha[0:len(linha)-1]
+
+        print(linha_sem_barra_n.split(" ")[1], usuario)
+        print(linha_sem_barra_n.split(" ")[1] == usuario)
+        if linha_sem_barra_n.split(" ")[1] == usuario:
+            print("dentro")
+            id_usuario = linha_sem_barra_n.split(" ")[0]
+            userValido = True
+            break
+        linhasPercorridas += 1
+
+    if not userValido:
+        if tipo == "Premium":
+            arqUsuario = open("./Usuarios/premium.txt", "a")
+        else:
+            arqUsuario = open("./Usuarios/convidado.txt", "a")
+        novoUsuario = str(tamanhoArq) + " " + usuario + "\n"
+        arqUsuario.write(novoUsuario)
+        conn.sendall(mensagens.ENTRAR_NA_APP_ACK.encode("utf-8"))
+    else:
+        mensagem = mensagens.STATUS_DO_USUARIO + "," + str(id_usuario) + "," + tipo
+        conn.sendall(mensagem.encode("utf-8"))
+
+
+
+# Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
+    data = conn.recv(1024)
+    mensagem = (data.decode('utf-8').split(","))
+    print(mensagem)
+    if mensagem[0] == mensagens.ENTRAR_NA_APP:
+        entrarNaApp(mensagem)
 
-    with conn:
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            print(data.decode('utf-8'))
-            conn.sendall(b'Prazer, eu sou o servidor!')
 
-if __name__ == '__main__':
+# Inicializações
+host_ip = getIP()  # Pegar host_ip e host_name dinamicamente
+host_name = getHostName()
+TCP_PORT = 5000
+print("Host IP: ", host_ip)
+print("Host Name: ", host_name)
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp:
-        tcp.bind((HOST, PORT))
-        tcp.listen()
-        print('Server ready!')
+# Conexão TCP
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Socket TCP do servidor
+socket_address = (host_ip, TCP_PORT)
+server_socket.bind(socket_address)
+server_socket.listen()  # Iniciando servidor no socket_address
+print("(TCP) Ouvindo em: ", socket_address)
 
-        while True:
-            #Aceita entrada de cliente
-            conn, addr = tcp.accept()
-            thread = threading.Thread(target=conectado, args=(conn, addr))
-            thread.start()
+while True:
+    # Aceita entrada de cliente
+    conn, addr = server_socket.accept()
+    thread = threading.Thread(target=conectado, args=(conn, addr))
+    thread.start()

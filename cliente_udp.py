@@ -1,5 +1,4 @@
 import base64  # Converte dados de imagem em formato texto
-import os
 import pickle
 import queue
 import socket
@@ -7,9 +6,10 @@ import threading
 import time
 
 import cv2
-import mensagens
 import numpy as np
 import pyaudio
+
+import mensagens
 
 pararAudio = False
 
@@ -26,11 +26,11 @@ def reproduzirVideo(nomeVideo):
     global pararAudio
     pararAudio = False
     message = mensagens.REPRODUZIR_VIDEO.encode("utf-8")  # Mensagem enviada ao servidor
-    client_socket.sendto(message, (host_ip, UDP_PORT))
-    client_socket.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT))
+    client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+    client_socket_udp.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT))
     queue_audio = queue.Queue(maxsize=2000)
 
-    video_mensagem = client_socket.recv(BUFFER_SIZE)
+    video_mensagem = client_socket_udp.recv(BUFFER_SIZE)
     video_mensagem = video_mensagem.decode("utf-8")
     print(video_mensagem)
 
@@ -40,7 +40,7 @@ def reproduzirVideo(nomeVideo):
 
         # Receber datagrama de dados do servidor, no lado do cliente
         while True:
-            packet, _ = client_socket.recvfrom(BUFFER_SIZE)
+            packet, _ = client_socket_udp.recvfrom(BUFFER_SIZE)
             data = base64.b64decode(packet, ' /')  # Fazendo decode do datagrama recebido
             npdata = np.frombuffer(data, dtype=np.uint8)
             frame = cv2.imdecode(npdata, 1)
@@ -49,7 +49,7 @@ def reproduzirVideo(nomeVideo):
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q'):
                 message = mensagens.PARAR_STREAMING.encode("utf-8")  # Mensagem enviada ao servidor
-                client_socket.sendto(message, (host_ip, UDP_PORT))
+                client_socket_udp.sendto(message, (host_ip, UDP_PORT))
                 global pararAudio
                 pararAudio = True
                 cv2.destroyAllWindows()
@@ -97,14 +97,23 @@ def reproduzirVideo(nomeVideo):
 
 def listarVideos():
     message = mensagens.LISTAR_VIDEOS.encode("utf-8")  # Mensagem enviada ao servidor
-    client_socket.sendto(message, (host_ip, UDP_PORT))
-    mensagem = client_socket.recv(BUFFER_SIZE)
+    client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+    mensagem = client_socket_udp.recv(BUFFER_SIZE)
     mensagem = mensagem.decode("utf-8")
     print(mensagem)
-    lista_de_videos = client_socket.recv(BUFFER_SIZE)
+    lista_de_videos = client_socket_udp.recv(BUFFER_SIZE)
     lista_de_videos = pickle.loads(lista_de_videos)
     print(lista_de_videos)
     return lista_de_videos
+
+
+def entrarApp(usuario, tipo, ip):
+    mensagem = mensagens.ENTRAR_NA_APP + "," + usuario + "," + tipo + "," + ip
+    client_socket_tcp.sendall(mensagem.encode("utf-8"))
+    data = client_socket_tcp.recv(1024)
+    resp = data.decode('utf-8').split(",")
+    print(resp)
+    return resp
 
 
 # Inicializações
@@ -112,13 +121,18 @@ host_ip = getIP()  # Pegar host_ip e host_name dinamicamente
 host_name = getHostName()
 BUFFER_SIZE = 65536
 UDP_PORT = 6000
+TCP_PORT = 5000
 
 print("Host IP: ", host_ip)
 print("Host Name: ", host_name)
 
 # Socket para a conexão UDP
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do cliente
-client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
+client_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Socket UDP do cliente
+client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
+
+# Conexão TCP
+client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Socket TCP do cliente
+client_socket_tcp.connect((host_ip, TCP_PORT))
 
 audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 audio_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)

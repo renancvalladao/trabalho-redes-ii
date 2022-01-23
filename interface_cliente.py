@@ -1,6 +1,8 @@
+import socket
 from tkinter import *
-from tkinter import ttk
 from tkinter import messagebox
+from tkinter import ttk
+import mensagens
 import cliente_udp
 
 # Definição das constantes
@@ -101,48 +103,25 @@ class JanelaLogin:
         usuario_logado = usuario
         tipo_usuario_logado = tipo
 
-        # end_ip = self.ent_end_ip.get()
+        end_ip = socket.gethostbyname(socket.gethostname())
 
-        # Verifica se todos as entradas estão preenchidas
-        if usuario and tipo:
-            #Validar se usuário existe na pasta Usuarios
-            if tipo == "Premium":
-                arqUsuario = open("./Usuarios/premium.txt")
-            else:
-                arqUsuario = open("./Usuarios/convidado.txt")
-
-            linhas = arqUsuario.readlines()
-            arqUsuario.close()
-
-            userValido = False
-            tamanhoArq = len(linhas)
-            linhasPercorridas = 1
-
-            for linha in linhas:
-                linha_sem_barra_n = linha[0:len(linha)-1]
-
-                if linhasPercorridas == tamanhoArq:
-                    linha_sem_barra_n = linha[0:len(linha)]
-
-                if linha_sem_barra_n == usuario: 
-                    userValido = True
-                    break
-                linhasPercorridas += 1
-                
-            if(userValido == False):
-                errorText = "Usuário " + usuario + " categoria " + tipo + "\nnão encontrado!"
-                messagebox.showerror("ERRO", errorText)
-                #messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
-            else:
-                # Reseta os valores das entrys e radio buttons
-                self.ent_usuario.delete(0, END)
-                self.tipo.set("Premium")
-                # self.ent_end_ip.delete(0, END)
-                # Chama a janela de menu (passa a janela atual)
-                JanelaMenu(self)
-        else:
+        if not(usuario and tipo):
             # Mensagem de erro
             messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
+        else:
+            resp = cliente_udp.entrarApp(usuario_logado, tipo_usuario_logado, end_ip)
+            if resp[0] == mensagens.ENTRAR_NA_APP_ACK:
+                messagebox.showinfo("Status", "Usuário criado com sucesso!")
+            elif resp[0] == mensagens.STATUS_DO_USUARIO:
+                messagebox.showinfo("Status", "ID: " + resp[1] + "\n" + "Tipo: " + resp[2])
+            # Reseta os valores das entrys e radio buttons
+            self.ent_usuario.delete(0, END)
+            self.tipo.set("Premium")
+            # self.ent_end_ip.delete(0, END)
+            # Chama a janela de menu (passa a janela atual)
+            JanelaMenu(self)
+
+
 
     # Fecha o programa
     def sair(self):
