@@ -122,8 +122,6 @@ class JanelaLogin:
             # Chama a janela de menu (passa a janela atual)
             JanelaMenu(self)
 
-
-
     # Fecha o programa
     def sair(self):
         # Fecha a janela atual
@@ -225,7 +223,6 @@ class JanelaMenu:
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
             JanelaGrupo(self)
-
 
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
@@ -357,6 +354,9 @@ class JanelaGrupo:
         if nome:
             # Verifica se o usuário já é um membro do grupo
             if nome not in self.membros:
+                # Reseta o conteúdo da entry
+                self.ent_adiciona.delete(0, END)
+
                 # 
                 # Código para adicionar o usuário no grupo no 
                 # servidor gerenciador de serviços
