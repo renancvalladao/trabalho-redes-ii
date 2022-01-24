@@ -352,27 +352,44 @@ class JanelaGrupo:
         nome = self.ent_adiciona.get()
         # Verifica se algo foi digitado na entry
         if nome:
-            # Verifica se o usuário já é um membro do grupo
-            if nome not in self.membros:
-                # Reseta o conteúdo da entry
-                self.ent_adiciona.delete(0, END)
 
-                # 
-                # Código para adicionar o usuário no grupo no 
-                # servidor gerenciador de serviços
-                # 
-                arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
-                arqGrupo.write(nome)
-                arqGrupo.write("\n")
-                arqGrupo.close()                
-                # Adiciona o nome do vídeo na lista de vídeos da interface
-                self.membros.append(nome)
-                # Chama a função que atualiza a lista de vídeos da interface
-                self.atualiza_lista()
-                print("MEMBRO_ADICIONADO")
+            # Verifica se o usuário existe
+            arqUsuario = open("Usuarios/usuarios.txt")
+            linhas = arqUsuario.readlines()
+            arqUsuario.close()
+
+            userValido = False
+            for linha in linhas:
+                linha_sem_barra_n = linha[0:len(linha)-1]
+                if linha_sem_barra_n.split(" ")[0] == nome:
+                    userValido = True
+                    break
+
+            if userValido:
+                # Verifica se o usuário já é um membro do grupo
+                if nome not in self.membros:
+                    # Reseta o conteúdo da entry
+                    self.ent_adiciona.delete(0, END)
+
+                    # 
+                    # Código para adicionar o usuário no grupo no 
+                    # servidor gerenciador de serviços
+                    # 
+                    arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
+                    arqGrupo.write(nome)
+                    arqGrupo.write("\n")
+                    arqGrupo.close()                
+                    # Adiciona o nome do vídeo na lista de vídeos da interface
+                    self.membros.append(nome)
+                    # Chama a função que atualiza a lista de vídeos da interface
+                    self.atualiza_lista()
+                    print("MEMBRO_ADICIONADO")
+                else:
+                    # Mensagem de erro
+                    messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
             else:
                 # Mensagem de erro
-                messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
+                messagebox.showerror("ERRO", "Não existe um usuário\ncom este nome")
         else:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Digite o nome de usuário\nque você deseja adicionar")
