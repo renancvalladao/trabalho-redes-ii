@@ -17,8 +17,10 @@ BT_BORDER = 3
 
 # Variaveis globais
 global usuario_logado
+usuario_logado = ""
 global tipo_usuario_logado
 global membros
+
 
 class JanelaLogin:
     def __init__(self, parent=None):
@@ -97,8 +99,8 @@ class JanelaLogin:
         usuario = self.ent_usuario.get()
         tipo = self.tipo.get()
 
-        #Setando usuario logado e tipo globalmente
-        global usuario_logado 
+        # Setando usuario logado e tipo globalmente
+        global usuario_logado
         global tipo_usuario_logado
 
         usuario_logado = usuario
@@ -106,7 +108,7 @@ class JanelaLogin:
 
         end_ip = socket.gethostbyname(socket.gethostname())
 
-        if not(usuario and tipo):
+        if not (usuario and tipo):
             # Mensagem de erro
             messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
         else:
@@ -125,6 +127,8 @@ class JanelaLogin:
 
     # Fecha o programa
     def sair(self):
+        if usuario_logado != "":
+            cliente_udp.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -176,9 +180,9 @@ class JanelaMenu:
     # Criação dos widgets
     def criar_widgets(self):
         if tipo_usuario_logado == "Premium":
-            #Verifica se grupo ja existe (Verifica se o arquivo no nome do usuario premium logado existe)
+            # Verifica se grupo ja existe (Verifica se o arquivo no nome do usuario premium logado existe)
             try:
-                with open("./Grupos/" + usuario_logado + ".txt","r") as f:
+                with open("./Grupos/" + usuario_logado + ".txt", "r") as f:
                     self.grupo = True
                     f.close()
             except IOError:
@@ -186,11 +190,11 @@ class JanelaMenu:
 
             # Criação e posicionamento do botão que cria um grupo (parte 2 do trabalho)
             if self.grupo:
-                self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
-                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+                self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER,
+                                       command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             else:
-                self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER, 
-                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
+                self.bt_grupo = Button(self.root, text="Criar grupo", font=LB_FONT, bd=BT_BORDER,
+                                       command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
         # Criação e posicionamento do botão que acessa o catálogo de vídeos
@@ -198,7 +202,7 @@ class JanelaMenu:
                                 command=self.bt_videos_click,
                                 bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
 
-        if tipo_usuario_logado == "Premium":                        
+        if tipo_usuario_logado == "Premium":
             self.bt_videos.place(relx=0.35, rely=0.6, relwidth=0.3, relheight=0.15)
         else:
             self.bt_videos.place(relx=0.35, rely=0.35, relwidth=0.3, relheight=0.15)
@@ -208,16 +212,16 @@ class JanelaMenu:
         if not self.grupo:
             self.grupo = True
             self.bt_grupo.destroy()
-            self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
+            self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER,
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
             resp = cliente_udp.criarGrupo(usuario_logado)
 
-            #Para adicionar novos membros    
-            #arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
-            #arqGrupo.write("abc")
-            #arqGrupo.close()
+            # Para adicionar novos membros
+            # arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
+            # arqGrupo.write("abc")
+            # arqGrupo.close()
 
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
@@ -240,6 +244,8 @@ class JanelaMenu:
 
     # Fecha o programa
     def sair(self):
+        if usuario_logado != "":
+            cliente_udp.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -345,7 +351,7 @@ class JanelaGrupo:
 
             userValido = False
             for linha in linhas:
-                linha_sem_barra_n = linha[0:len(linha)-1]
+                linha_sem_barra_n = linha[0:len(linha) - 1]
                 if linha_sem_barra_n.split(" ")[0] == nome:
                     userValido = True
                     break
@@ -423,6 +429,8 @@ class JanelaGrupo:
 
     # Fecha o programa
     def sair(self):
+        if usuario_logado != "":
+            cliente_udp.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -502,14 +510,14 @@ class JanelaVideos:
         self.resolucao = StringVar()
         self.resolucao.set("240p")
         bt_resolucao_1 = Radiobutton(self.root, text="240p", variable=self.resolucao, value="240p",
-                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+                                     bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
         bt_resolucao_1.place(relx=0.41, rely=0.58)
         if tipo_usuario_logado == "Premium":
             bt_resolucao_2 = Radiobutton(self.root, text="480p", variable=self.resolucao, value="480p",
-                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+                                         bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
             bt_resolucao_2.place(relx=0.53, rely=0.58)
             bt_resolucao_3 = Radiobutton(self.root, text="720p", variable=self.resolucao, value="720p",
-                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+                                         bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
             bt_resolucao_3.place(relx=0.65, rely=0.58)
 
         # Criação e posicionamento do label e radio buttons de tipo de streaming
@@ -518,11 +526,11 @@ class JanelaVideos:
         self.streaming = StringVar()
         self.streaming.set("Individual")
         bt_streaming_1 = Radiobutton(self.root, text="Individual", variable=self.streaming, value="Individual",
-                                bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+                                     bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
         bt_streaming_1.place(relx=0.43, rely=0.7)
         if tipo_usuario_logado == "Premium":
             bt_streaming_2 = Radiobutton(self.root, text="Grupo", variable=self.streaming, value="Grupo",
-                                    bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
+                                         bg=BACKGROUND_COLOR, fg=FOREGROUND_COLOR, font=LB_FONT)
             bt_streaming_2.place(relx=0.6, rely=0.7)
 
         # Criação e posicionamento do botão para assistir o vídeo selecionado
@@ -549,7 +557,7 @@ class JanelaVideos:
         else:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Selecione o vídeo que\nvocê deseja assistir")
-    
+
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
         # self.video = nome do arquivo do vídeo, self.resolucao.get() = resolução do vídeo, 
@@ -570,6 +578,8 @@ class JanelaVideos:
 
     # Fecha o programa
     def sair(self):
+        if usuario_logado != "":
+            cliente_udp.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 

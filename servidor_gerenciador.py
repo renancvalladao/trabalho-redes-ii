@@ -1,3 +1,4 @@
+import os
 import socket
 import threading
 
@@ -87,6 +88,30 @@ def removerUsuario(mensagem):
     conn.sendall(mensagem.encode("utf-8"))
 
 
+def sairDaApp(usuario):
+    if os.path.exists("./Grupos/" + usuario + ".txt"):
+        os.remove("./Grupos/" + usuario + ".txt")
+
+    arqUsuario = open("Usuarios/usuarios.txt")
+    usuarios = []
+
+    linhas = arqUsuario.readlines()
+    arqUsuario.close()
+
+    for linha in linhas:
+        linha_sem_barra_n = linha[0:len(linha) - 1]
+
+        if not linha_sem_barra_n.split(" ")[0] == usuario:
+            usuarios.append(linha_sem_barra_n)
+
+    arqUsuario = open("Usuarios/usuarios.txt", "w")
+    for usuario in usuarios:
+        arqUsuario.write(usuario + "\n")
+    arqUsuario.close()
+    mensagem = mensagens.SAIR_DA_APP_ACK
+    conn.sendall(mensagem.encode("utf-8"))
+
+
 # Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
@@ -106,6 +131,8 @@ def conectado(conn, client):
             addUsuario(mensagem)
         elif mensagem[0] == mensagens.REMOVER_USUARIO_GRUPO:
             removerUsuario(mensagem)
+        elif mensagem[0] == mensagens.SAIR_DA_APP:
+            sairDaApp(mensagem[1])
 
 
 # Inicializações

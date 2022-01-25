@@ -12,6 +12,7 @@ import pyaudio
 import mensagens
 
 pararAudio = False
+reproduzindoVideo = False
 
 
 def getIP():
@@ -35,6 +36,8 @@ def reproduzirVideo(nomeVideo):
     print(video_mensagem)
 
     def receive_video():
+        global reproduzindoVideo
+        reproduzindoVideo = True
         cv2.namedWindow("Video no Cliente")
         cv2.moveWindow("Video no Cliente", 10, 360)
 
@@ -47,7 +50,8 @@ def reproduzirVideo(nomeVideo):
             cv2.imshow("Video no Cliente", frame)  # Display do video no cliente
 
             key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
+            if key == ord('q') or not reproduzindoVideo:
+                reproduzindoVideo = False
                 message = mensagens.PARAR_STREAMING.encode("utf-8")  # Mensagem enviada ao servidor
                 client_socket_udp.sendto(message, (host_ip, UDP_PORT))
                 global pararAudio
@@ -113,6 +117,17 @@ def entrarApp(usuario, tipo, ip):
     data = client_socket_tcp.recv(1024)
     resp = data.decode('utf-8').split(",")
     print(resp)
+    return resp
+
+
+def sairApp(usuario):
+    mensagem = mensagens.SAIR_DA_APP + "," + usuario
+    client_socket_tcp.sendall(mensagem.encode("utf-8"))
+    data = client_socket_tcp.recv(1024)
+    resp = data.decode('utf-8')
+    print(resp)
+    global reproduzindoVideo
+    reproduzindoVideo = False
     return resp
 
 
