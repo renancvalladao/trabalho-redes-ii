@@ -49,8 +49,10 @@ def reproduzirVideo(nomeVideo):
             frame = cv2.imdecode(npdata, 1)
             cv2.imshow("Video no Cliente", frame)  # Display do video no cliente
 
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('q') or not reproduzindoVideo:
+            # key = cv2.waitKey(1) & 0xFF
+            # Verifica se a janela está aberta
+            open = cv2.getWindowProperty("Video no Cliente", cv2.WND_PROP_VISIBLE & cv2.waitKey(1))
+            if not open or not reproduzindoVideo:
                 reproduzindoVideo = False
                 message = mensagens.PARAR_STREAMING.encode("utf-8")  # Mensagem enviada ao servidor
                 client_socket_udp.sendto(message, (host_ip, UDP_PORT))
