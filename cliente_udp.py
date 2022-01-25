@@ -134,6 +134,16 @@ def verGrupo(usuario):
     return resp
 
 
+def addUsuario(grupo, usuario):
+    mensagem = mensagens.ADD_USUARIO_GRUPO + "," + grupo + "," + usuario
+    client_socket_tcp.sendall(mensagem.encode("utf-8"))
+    data = client_socket_tcp.recv(1024)
+    resp = data.decode('utf-8')
+    print(resp)
+    return resp
+
+
+
 # Inicializações
 host_ip = getIP()  # Pegar host_ip e host_name dinamicamente
 host_name = getHostName()

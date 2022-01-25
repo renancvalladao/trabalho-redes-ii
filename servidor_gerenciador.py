@@ -50,7 +50,7 @@ def verGrupo(usuario):
     membros = ""
 
     for linha in linhas:
-        linha_sem_barra_n = linha[0:len(linha)-1]
+        linha_sem_barra_n = linha[0:len(linha) - 1]
 
         membros += linha_sem_barra_n + " "
 
@@ -59,11 +59,20 @@ def verGrupo(usuario):
 
 
 def criarGrupo(usuario):
-    arqGrupo = open("./Grupos/" + usuario + ".txt","w")
+    arqGrupo = open("./Grupos/" + usuario + ".txt", "w")
     arqGrupo.write(usuario)
     arqGrupo.write("\n")
     arqGrupo.close()
     mensagem = mensagens.CRIAR_GRUPO_ACK
+    conn.sendall(mensagem.encode("utf-8"))
+
+
+def addUsuario(mensagem):
+    arqGrupo = open("./Grupos/" + mensagem[1] + ".txt", "a")
+    arqGrupo.write(mensagem[2])
+    arqGrupo.write("\n")
+    arqGrupo.close()
+    mensagem = mensagens.ADD_USUARIO_GRUPO_ACK
     conn.sendall(mensagem.encode("utf-8"))
 
 
@@ -82,6 +91,8 @@ def conectado(conn, client):
             verGrupo(mensagem[1])
         elif mensagem[0] == mensagens.CRIAR_GRUPO:
             criarGrupo(mensagem[1])
+        elif mensagem[0] == mensagens.ADD_USUARIO_GRUPO:
+            addUsuario(mensagem)
 
 
 # Inicializações

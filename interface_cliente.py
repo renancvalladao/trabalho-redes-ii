@@ -363,15 +363,11 @@ class JanelaGrupo:
                     # Código para adicionar o usuário no grupo no 
                     # servidor gerenciador de serviços
                     # 
-                    arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
-                    arqGrupo.write(nome)
-                    arqGrupo.write("\n")
-                    arqGrupo.close()                
+                    print(cliente_udp.addUsuario(usuario_logado, nome))
                     # Adiciona o nome do vídeo na lista de vídeos da interface
                     self.membros.append(nome)
                     # Chama a função que atualiza a lista de vídeos da interface
                     self.atualiza_lista()
-                    print("MEMBRO_ADICIONADO")
                 else:
                     # Mensagem de erro
                     messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
