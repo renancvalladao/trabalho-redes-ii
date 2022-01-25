@@ -143,6 +143,15 @@ def addUsuario(grupo, usuario):
     return resp
 
 
+def removerUsuario(grupo, novosMembros):
+    mensagem = mensagens.REMOVER_USUARIO_GRUPO + "," + grupo + "," + " ".join(novosMembros)
+    client_socket_tcp.sendall(mensagem.encode("utf-8"))
+    data = client_socket_tcp.recv(1024)
+    resp = data.decode('utf-8')
+    print(resp)
+    return resp
+
+
 
 # Inicializações
 host_ip = getIP()  # Pegar host_ip e host_name dinamicamente

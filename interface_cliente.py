@@ -214,8 +214,6 @@ class JanelaMenu:
 
             resp = cliente_udp.criarGrupo(usuario_logado)
 
-            print(resp)
-
             #Para adicionar novos membros    
             #arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
             #arqGrupo.write("abc")
@@ -224,7 +222,6 @@ class JanelaMenu:
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
             resp = cliente_udp.verGrupo(usuario_logado)
-            print(resp)
             global membros
             membros = resp[1].split(" ")
             JanelaGrupo(self)
@@ -363,7 +360,7 @@ class JanelaGrupo:
                     # Código para adicionar o usuário no grupo no 
                     # servidor gerenciador de serviços
                     # 
-                    print(cliente_udp.addUsuario(usuario_logado, nome))
+                    cliente_udp.addUsuario(usuario_logado, nome)
                     # Adiciona o nome do vídeo na lista de vídeos da interface
                     self.membros.append(nome)
                     # Chama a função que atualiza a lista de vídeos da interface
@@ -393,17 +390,8 @@ class JanelaGrupo:
                 # Chama a função que atualiza a lista de membros na interface
                 self.atualiza_lista()
 
-                #
-                # Código que remove o membro do grupo no servidor
-                #
-                arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
+                cliente_udp.removerUsuario(usuario_logado, self.membros)
 
-                for membro in self.membros:
-                    arqGrupo.write(membro)
-                    arqGrupo.write("\n")
-
-                arqGrupo.close()
-                print("MEMBRO_REMOVIDO")
             else:
                 messagebox.showerror("ERRO", "Você não pode se remover")
         # Verifica se mais de um membro foi selecionado

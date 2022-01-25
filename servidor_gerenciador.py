@@ -76,6 +76,17 @@ def addUsuario(mensagem):
     conn.sendall(mensagem.encode("utf-8"))
 
 
+def removerUsuario(mensagem):
+    membros = mensagem[2].split(" ")
+    arqGrupo = open("./Grupos/" + mensagem[1] + ".txt","w")
+    for membro in membros:
+        arqGrupo.write(membro)
+        arqGrupo.write("\n")
+    arqGrupo.close()
+    mensagem = mensagens.REMOVER_USUARIO_GRUPO_ACK
+    conn.sendall(mensagem.encode("utf-8"))
+
+
 # Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
@@ -93,6 +104,8 @@ def conectado(conn, client):
             criarGrupo(mensagem[1])
         elif mensagem[0] == mensagens.ADD_USUARIO_GRUPO:
             addUsuario(mensagem)
+        elif mensagem[0] == mensagens.REMOVER_USUARIO_GRUPO:
+            removerUsuario(mensagem)
 
 
 # Inicializações
