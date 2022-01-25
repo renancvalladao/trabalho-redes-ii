@@ -25,7 +25,7 @@ def entrarNaApp(mensagem):
     userValido = False
 
     for linha in linhas:
-        linha_sem_barra_n = linha[0:len(linha)-1]
+        linha_sem_barra_n = linha[0:len(linha) - 1]
 
         if linha_sem_barra_n.split(" ")[0] == usuario:
             tipo = linha_sem_barra_n.split(" ")[1]
@@ -42,15 +42,35 @@ def entrarNaApp(mensagem):
         conn.sendall(mensagem.encode("utf-8"))
 
 
+def verGrupo(usuario):
+    arqGrupo = open("./Grupos/" + usuario + ".txt")
+    linhas = arqGrupo.readlines()
+    arqGrupo.close()
+
+    membros = ""
+
+    for linha in linhas:
+        linha_sem_barra_n = linha[0:len(linha)-1]
+
+        membros += linha_sem_barra_n + " "
+
+    mensagem = mensagens.GRUPO_DE_STREAMING + "," + membros[0:-1]
+    conn.sendall(mensagem.encode("utf-8"))
+
 
 # Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
-    data = conn.recv(1024)
-    mensagem = (data.decode('utf-8').split(","))
-    print(mensagem)
-    if mensagem[0] == mensagens.ENTRAR_NA_APP:
-        entrarNaApp(mensagem)
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+        mensagem = (data.decode('utf-8').split(","))
+        print(mensagem)
+        if mensagem[0] == mensagens.ENTRAR_NA_APP:
+            entrarNaApp(mensagem)
+        elif mensagem[0] == mensagens.VER_GRUPO:
+            verGrupo(mensagem[1])
 
 
 # Inicializações

@@ -18,6 +18,7 @@ BT_BORDER = 3
 # Variaveis globais
 global usuario_logado
 global tipo_usuario_logado
+global membros
 
 class JanelaLogin:
     def __init__(self, parent=None):
@@ -222,6 +223,10 @@ class JanelaMenu:
 
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
+            resp = cliente_udp.verGrupo(usuario_logado)
+            print(resp)
+            global membros
+            membros = resp[1].split(" ")
             JanelaGrupo(self)
 
     # Função executada ao clicar no botão bt_videos
@@ -288,28 +293,11 @@ class JanelaGrupo:
 
     # Criação dos widgets
     def criar_widgets(self):
-        # 
+        #
         # Código para recuperar o ID dos membros do grupo no servidor
-        # 
-        global usuario_logado
-        arqGrupo = open("./Grupos/" + usuario_logado + ".txt")
-        linhas = arqGrupo.readlines()
-        arqGrupo.close()
+        #
 
-        tamanhoArq = len(linhas)
-        linhasPercorridas = 1
-        self.membros = []
-
-        for linha in linhas:
-            linha_sem_barra_n = linha[0:len(linha)-1]
-
-            self.membros.append(linha_sem_barra_n)
-            linhasPercorridas += 1
-
-        # lista exemplo de membros
-        #self.membros = ["nome1", "nome2", "nome3", "nome4", "nome5",
-        #                "nome6", "nome7", "nome8", "nome9", "nome10",
-        #                "nome11", "nome12", "nome13", "nome14", "nome15"]
+        self.membros = membros
 
         # Criação e posicionamento da entry para adicionar um membro
         self.ent_adiciona = Entry(self.root, font=ENT_FONT)

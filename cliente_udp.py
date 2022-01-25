@@ -116,6 +116,15 @@ def entrarApp(usuario, tipo, ip):
     return resp
 
 
+def verGrupo(usuario):
+    mensagem = mensagens.VER_GRUPO + "," + usuario
+    client_socket_tcp.sendall(mensagem.encode("utf-8"))
+    data = client_socket_tcp.recv(1024)
+    resp = data.decode('utf-8').split(",")
+    print(resp)
+    return resp
+
+
 # Inicializações
 host_ip = getIP()  # Pegar host_ip e host_name dinamicamente
 host_name = getHostName()
