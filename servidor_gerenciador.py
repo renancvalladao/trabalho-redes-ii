@@ -58,6 +58,15 @@ def verGrupo(usuario):
     conn.sendall(mensagem.encode("utf-8"))
 
 
+def criarGrupo(usuario):
+    arqGrupo = open("./Grupos/" + usuario + ".txt","w")
+    arqGrupo.write(usuario)
+    arqGrupo.write("\n")
+    arqGrupo.close()
+    mensagem = mensagens.CRIAR_GRUPO_ACK
+    conn.sendall(mensagem.encode("utf-8"))
+
+
 # Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
@@ -71,6 +80,8 @@ def conectado(conn, client):
             entrarNaApp(mensagem)
         elif mensagem[0] == mensagens.VER_GRUPO:
             verGrupo(mensagem[1])
+        elif mensagem[0] == mensagens.CRIAR_GRUPO:
+            criarGrupo(mensagem[1])
 
 
 # Inicializações

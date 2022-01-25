@@ -211,11 +211,11 @@ class JanelaMenu:
             self.bt_grupo = Button(self.root, text="Ver grupo", font=LB_FONT, bd=BT_BORDER, 
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
-            arqGrupo = open("./Grupos/" + usuario_logado + ".txt","w")
-            arqGrupo.write(usuario_logado)
-            arqGrupo.write("\n")
-            arqGrupo.close()
-            print("GRUPO_CRIADO")
+
+            resp = cliente_udp.criarGrupo(usuario_logado)
+
+            print(resp)
+
             #Para adicionar novos membros    
             #arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
             #arqGrupo.write("abc")
