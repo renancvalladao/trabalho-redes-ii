@@ -254,7 +254,7 @@ class JanelaGrupo:
     def __init__(self, parent):
         # Fecha a janela anterior
         parent.root.destroy()
-        # Cria a janela de catálogo de vídeos
+        # Cria a janela de grupo
         self.root = Tk()
 
         # Configurações básicas da janela
