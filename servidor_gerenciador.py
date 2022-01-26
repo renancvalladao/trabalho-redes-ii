@@ -13,7 +13,7 @@ def getHostName():
     return socket.gethostname()
 
 
-def entrarNaApp(mensagem):
+def entrarNaApp(mensagem, conn):
     usuario = mensagem[1]
     tipo = mensagem[2]
     ip = mensagem[3]
@@ -43,7 +43,7 @@ def entrarNaApp(mensagem):
         conn.sendall(mensagem.encode("utf-8"))
 
 
-def verGrupo(usuario):
+def verGrupo(usuario, conn):
     arqGrupo = open("./Grupos/" + usuario + ".txt")
     linhas = arqGrupo.readlines()
     arqGrupo.close()
@@ -59,7 +59,7 @@ def verGrupo(usuario):
     conn.sendall(mensagem.encode("utf-8"))
 
 
-def criarGrupo(usuario):
+def criarGrupo(usuario, conn):
     arqGrupo = open("./Grupos/" + usuario + ".txt", "w")
     arqGrupo.write(usuario)
     arqGrupo.write("\n")
@@ -68,7 +68,7 @@ def criarGrupo(usuario):
     conn.sendall(mensagem.encode("utf-8"))
 
 
-def addUsuario(mensagem):
+def addUsuario(mensagem, conn):
     # Leitura do arquivo usuarios.txt
     arqUsuario = open("Usuarios/usuarios.txt", "r")
     linhas = arqUsuario.readlines()
@@ -93,7 +93,7 @@ def addUsuario(mensagem):
     conn.sendall(mensagem.encode("utf-8"))
 
 
-def removerUsuario(mensagem):
+def removerUsuario(mensagem, conn):
     membros = mensagem[2].split(" ")
     arqGrupo = open("./Grupos/" + mensagem[1] + ".txt","w")
     for membro in membros:
@@ -104,7 +104,7 @@ def removerUsuario(mensagem):
     conn.sendall(mensagem.encode("utf-8"))
 
 
-def sairDaApp(usuario):
+def sairDaApp(usuario, conn):
     if os.path.exists("./Grupos/" + usuario + ".txt"):
         os.remove("./Grupos/" + usuario + ".txt")
 
@@ -128,7 +128,7 @@ def sairDaApp(usuario):
     conn.sendall(mensagem.encode("utf-8"))
 
 
-def getUserInformation(usuario):
+def getUserInformation(usuario, conn):
     arqUsuario = open("Usuarios/usuarios.txt")
 
     linhas = arqUsuario.readlines()
@@ -155,19 +155,19 @@ def conectado(conn, client):
         mensagem = (data.decode('utf-8').split(","))
         print(mensagem)
         if mensagem[0] == mensagens.ENTRAR_NA_APP:
-            entrarNaApp(mensagem)
+            entrarNaApp(mensagem, conn)
         elif mensagem[0] == mensagens.VER_GRUPO:
-            verGrupo(mensagem[1])
+            verGrupo(mensagem[1], conn)
         elif mensagem[0] == mensagens.CRIAR_GRUPO:
-            criarGrupo(mensagem[1])
+            criarGrupo(mensagem[1], conn)
         elif mensagem[0] == mensagens.ADD_USUARIO_GRUPO:
-            addUsuario(mensagem)
+            addUsuario(mensagem, conn)
         elif mensagem[0] == mensagens.REMOVER_USUARIO_GRUPO:
-            removerUsuario(mensagem)
+            removerUsuario(mensagem, conn)
         elif mensagem[0] == mensagens.SAIR_DA_APP:
-            sairDaApp(mensagem[1])
+            sairDaApp(mensagem[1], conn)
         elif mensagem[0] == mensagens.GET_USER_INFORMATION:
-            getUserInformation(mensagem[1])
+            getUserInformation(mensagem[1], conn)
 
 
 # Inicializações
