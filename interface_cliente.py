@@ -343,40 +343,27 @@ class JanelaGrupo:
         nome = self.ent_adiciona.get()
         # Verifica se algo foi digitado na entry
         if nome:
+            # Verifica se o usuário já é um membro do grupo
+            if nome not in self.membros:
+                # Adiciona o usuário no grupo no servidor gerenciador de serviços
+                resp = cliente.addUsuario(usuario_logado, nome)
 
-            # Verifica se o usuário existe
-            arqUsuario = open("Usuarios/usuarios.txt")
-            linhas = arqUsuario.readlines()
-            arqUsuario.close()
-
-            userValido = False
-            for linha in linhas:
-                linha_sem_barra_n = linha[0:len(linha) - 1]
-                if linha_sem_barra_n.split(" ")[0] == nome:
-                    userValido = True
-                    break
-
-            if userValido:
-                # Verifica se o usuário já é um membro do grupo
-                if nome not in self.membros:
+                # Usuário adicionado com sucesso
+                if resp == mensagens.ADD_USUARIO_GRUPO_ACK:
                     # Reseta o conteúdo da entry
                     self.ent_adiciona.delete(0, END)
-
-                    # 
-                    # Código para adicionar o usuário no grupo no 
-                    # servidor gerenciador de serviços
-                    # 
-                    cliente.addUsuario(usuario_logado, nome)
-                    # Adiciona o nome do vídeo na lista de vídeos da interface
+                    # Adiciona o nome do usuário na lista de membros da interface
                     self.membros.append(nome)
-                    # Chama a função que atualiza a lista de vídeos da interface
+                    # Chama a função que atualiza a lista de membros da interface
                     self.atualiza_lista()
-                else:
+
+                # Usuário não foi adicionado (ERRO)
+                elif resp == mensagens.ADD_USUARIO_GRUPO_NACK:
                     # Mensagem de erro
-                    messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
+                    messagebox.showerror("ERRO", "Não existe um usuário\ncom este nome")
             else:
                 # Mensagem de erro
-                messagebox.showerror("ERRO", "Não existe um usuário\ncom este nome")
+                messagebox.showinfo("MEMBRO NÃO ADICIONADO", "Já existe um membro com\neste nome no grupo")
         else:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Digite o nome de usuário\nque você deseja adicionar")
@@ -568,14 +555,7 @@ class JanelaVideos:
         #print(self.streaming.get())
         tipo_transmissao = self.streaming.get()
         cliente.reproduzirVideoGrupo(nome_arquivo_video, usuario_logado,tipo_transmissao)
-        #if tipo_transmissao == "Individual":
-        #    cliente.reproduzirVideo(nome_arquivo_video, usuario_logado,"individual")
-        #elif tipo_transmissao == "Grupo":
-        #    cliente.reproduzirVideo(nome_arquivo_video, usuario_logado,"grupo")
         
-        
-
-
     # Volta para a janela de menu
     def voltar(self):
         # Chama a janela de menu (passa a janela atual)

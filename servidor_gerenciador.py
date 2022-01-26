@@ -69,11 +69,27 @@ def criarGrupo(usuario):
 
 
 def addUsuario(mensagem):
-    arqGrupo = open("./Grupos/" + mensagem[1] + ".txt", "a")
-    arqGrupo.write(mensagem[2])
-    arqGrupo.write("\n")
-    arqGrupo.close()
-    mensagem = mensagens.ADD_USUARIO_GRUPO_ACK
+    # Leitura do arquivo usuarios.txt
+    arqUsuario = open("Usuarios/usuarios.txt", "r")
+    linhas = arqUsuario.readlines()
+    arqUsuario.close()
+
+    userValido = False
+    for linha in linhas:
+        linha_sem_barra_n = linha[0:len(linha) - 1]
+        if linha_sem_barra_n.split(" ")[0] == mensagem[2]:
+            userValido = True
+            break
+        
+    # Verifica se o usuário existe
+    if userValido:
+        arqGrupo = open("./Grupos/" + mensagem[1] + ".txt", "a")
+        arqGrupo.write(mensagem[2])
+        arqGrupo.write("\n")
+        arqGrupo.close()
+        mensagem = mensagens.ADD_USUARIO_GRUPO_ACK
+    else:
+        mensagem = mensagens.ADD_USUARIO_GRUPO_NACK
     conn.sendall(mensagem.encode("utf-8"))
 
 
