@@ -564,7 +564,11 @@ class JanelaVideos:
         # self.streaming.get() = tipo de streaming
         nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
         # Código para pedir o vídeo ao servidor
-        cliente.reproduzirVideo(nome_arquivo_video, usuario_logado)
+        #Verifica se é transmissao ao grupo ou individual
+        #print(self.streaming.get())
+        tipo_transmissao = self.streaming.get()
+        if tipo_transmissao == "Individual":
+            cliente.reproduzirVideo(nome_arquivo_video, usuario_logado)
 
     # Volta para a janela de menu
     def voltar(self):
