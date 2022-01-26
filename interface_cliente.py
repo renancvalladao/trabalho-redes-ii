@@ -239,6 +239,8 @@ class JanelaMenu:
 
     # Volta para a janela de login
     def logout(self):
+        global usuario_logado
+        usuario_logado = ""
         # Chama a janela de login (passa a janela atual)
         JanelaLogin(self)
 
@@ -411,6 +413,8 @@ class JanelaGrupo:
 
     # Volta para a janela de login
     def logout(self):
+        global usuario_logado
+        usuario_logado = ""
         # Chama a janela de login (passa a janela atual)
         JanelaLogin(self)
 
@@ -563,6 +567,8 @@ class JanelaVideos:
 
     # Volta para a janela de login
     def logout(self):
+        global usuario_logado
+        usuario_logado = ""
         # Chama a janela de login (passa a janela atual)
         JanelaLogin(self)
 
