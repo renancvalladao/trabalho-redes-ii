@@ -6,6 +6,7 @@ import threading
 import time
 
 import cv2
+from matplotlib.pyplot import flag
 import numpy as np
 import pyaudio
 
@@ -23,16 +24,78 @@ def getHostName():
     return socket.gethostname()
 
 
-def reproduzirVideo(nomeVideo, usuario):
+def reproduzirVideoGrupo(nomeVideo, usuario, flagGrupo):
+    if flagGrupo == "Individual":
+        reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
+    elif flagGrupo == "Grupo":
+
+        #Verificar membros do grupo
+        arqGrupo = open("./Grupos/" + usuario + ".txt")
+        linhas = arqGrupo.readlines()
+        arqGrupo.close()
+
+        membros = []
+
+        for linha in linhas:
+            linha_sem_barra_n = linha[0:len(linha) - 1]
+            membros.append(linha_sem_barra_n)
+
+        tamanhoGrupo = len(membros)
+
+        #Pegando socket video
+        i = 0
+        socket_video = []
+        while (i < tamanhoGrupo):
+            arqVideoSocket = open("./InternalUserInfo/VideoSocket/" + membros[i] + ".txt")
+            linhaLida = arqVideoSocket.read()
+            arqVideoSocket.close()
+
+            branco = linhaLida.find(" ")
+            socket_video.append(linhaLida[branco+1:len(linhaLida)])
+            i += 1
+
+        print("aqui socket video")
+        print(socket_video)
+
+
+        #Pegando socket audio
+        i = 0
+        socket_audio = []
+        while (i < tamanhoGrupo):
+            arqAudioSocket = open("./InternalUserInfo/AudioSocket/" + membros[i] + ".txt")
+            linhaLida = arqAudioSocket.read()
+            arqAudioSocket.close()
+
+            branco = linhaLida.find(" ")
+            socket_audio.append(linhaLida[branco+1:len(linhaLida)])
+            i += 1
+
+        print("aqui socket video")
+        print(socket_audio)
+        
+        i = 0
+        while (i < tamanhoGrupo):
+            t1 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,socket_video[i],socket_audio[i]), args=())
+            t1.start()
+            i += 1
+
+        #t1 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,client_socket_udp[1],audio_socket[1]), args=())
+        #t1.start()
+        #t2 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,client_socket_udp_parm), args=())
+        #t2.start()
+
+
+def reproduzirVideo(nomeVideo, usuario,client_socket_udp_parm,audio_socket_parm):
+
     global pararAudio
     pararAudio = False
     message = mensagens.REPRODUZIR_VIDEO.encode("utf-8")  # Mensagem enviada ao servidor
-    client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+    client_socket_udp_parm.sendto(message, (host_ip, UDP_PORT))
     mensagem = nomeVideo + "," + usuario
-    client_socket_udp.sendto(mensagem.encode("utf-8"), (host_ip, UDP_PORT))
+    client_socket_udp_parm.sendto(mensagem.encode("utf-8"), (host_ip, UDP_PORT))
     queue_audio = queue.Queue(maxsize=2000)
 
-    video_mensagem = client_socket_udp.recv(BUFFER_SIZE)
+    video_mensagem = client_socket_udp_parm.recv(BUFFER_SIZE)
     video_mensagem = video_mensagem.decode("utf-8")
     print(video_mensagem)
 
@@ -44,7 +107,7 @@ def reproduzirVideo(nomeVideo, usuario):
 
         # Receber datagrama de dados do servidor, no lado do cliente
         while True:
-            packet, _ = client_socket_udp.recvfrom(BUFFER_SIZE)
+            packet, _ = client_socket_udp_parm.recvfrom(BUFFER_SIZE)
             data = base64.b64decode(packet, ' /')  # Fazendo decode do datagrama recebido
             npdata = np.frombuffer(data, dtype=np.uint8)
             frame = cv2.imdecode(npdata, 1)
@@ -56,7 +119,7 @@ def reproduzirVideo(nomeVideo, usuario):
             if not open or not reproduzindoVideo:
                 reproduzindoVideo = False
                 message = mensagens.PARAR_STREAMING.encode("utf-8")  # Mensagem enviada ao servidor
-                client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+                client_socket_udp_parm.sendto(message, (host_ip, UDP_PORT))
                 global pararAudio
                 pararAudio = True
                 cv2.destroyAllWindows()
@@ -74,12 +137,12 @@ def reproduzirVideo(nomeVideo, usuario):
                         frames_per_buffer=CHUNK)
 
         # create socket
-        audio_socket.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT - 1))
+        audio_socket_parm.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT - 1))
 
         def getAudioData():
             global pararAudio
             while True:
-                frame, _ = audio_socket.recvfrom(BUFFER_SIZE)
+                frame, _ = audio_socket_parm.recvfrom(BUFFER_SIZE)
                 if frame == b'Stopped':
                     break
                 queue_audio.put(frame)
@@ -93,7 +156,7 @@ def reproduzirVideo(nomeVideo, usuario):
         while not pararAudio:
             frame = queue_audio.get()
             stream.write(frame)
-        audio_socket.sendto(b'Stop', (host_ip, UDP_PORT - 1))
+        audio_socket_parm.sendto(b'Stop', (host_ip, UDP_PORT - 1))
         print("Encerrando transmissão de audio")
 
     t1 = threading.Thread(target=receive_audio, args=())
@@ -115,6 +178,24 @@ def listarVideos():
 
 
 def entrarApp(usuario, tipo, ip):
+
+    #Gravar socket de vídeo
+    arqInternalUserInfo = open("./InternalUserInfo/VideoSocket/" + usuario + ".txt", "w")
+    arqInternalUserInfo.write(usuario)
+    arqInternalUserInfo.write(" ")
+    arqInternalUserInfo.write(str(client_socket_udp))
+    arqInternalUserInfo.close()
+    print(client_socket_udp)
+
+    #Gravar socket de áudio
+    arqInternalUserInfo = open("./InternalUserInfo/AudioSocket/" + usuario + ".txt", "w")
+    arqInternalUserInfo.write(usuario)
+    arqInternalUserInfo.write(" ")
+    arqInternalUserInfo.write(str(audio_socket))
+    arqInternalUserInfo.close()
+    print(audio_socket)
+
+    #EntrarApp
     mensagem = mensagens.ENTRAR_NA_APP + "," + usuario + "," + tipo + "," + ip
     client_socket_tcp.sendall(mensagem.encode("utf-8"))
     data = client_socket_tcp.recv(1024)
@@ -189,6 +270,7 @@ client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Socket TCP do cliente
 client_socket_tcp.connect((host_ip, TCP_PORT))
 
+#Conexão UDP áudio
 audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 audio_socket.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
 

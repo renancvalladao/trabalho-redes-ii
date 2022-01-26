@@ -567,8 +567,14 @@ class JanelaVideos:
         #Verifica se é transmissao ao grupo ou individual
         #print(self.streaming.get())
         tipo_transmissao = self.streaming.get()
-        if tipo_transmissao == "Individual":
-            cliente.reproduzirVideo(nome_arquivo_video, usuario_logado)
+        cliente.reproduzirVideoGrupo(nome_arquivo_video, usuario_logado,tipo_transmissao)
+        #if tipo_transmissao == "Individual":
+        #    cliente.reproduzirVideo(nome_arquivo_video, usuario_logado,"individual")
+        #elif tipo_transmissao == "Grupo":
+        #    cliente.reproduzirVideo(nome_arquivo_video, usuario_logado,"grupo")
+        
+        
+
 
     # Volta para a janela de menu
     def voltar(self):
