@@ -564,7 +564,7 @@ class JanelaVideos:
         # self.streaming.get() = tipo de streaming
         nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
         # Código para pedir o vídeo ao servidor
-        cliente_udp.reproduzirVideo(nome_arquivo_video)
+        cliente_udp.reproduzirVideo(nome_arquivo_video, usuario_logado)
 
     # Volta para a janela de menu
     def voltar(self):

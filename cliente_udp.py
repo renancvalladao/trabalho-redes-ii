@@ -23,12 +23,13 @@ def getHostName():
     return socket.gethostname()
 
 
-def reproduzirVideo(nomeVideo):
+def reproduzirVideo(nomeVideo, usuario):
     global pararAudio
     pararAudio = False
     message = mensagens.REPRODUZIR_VIDEO.encode("utf-8")  # Mensagem enviada ao servidor
     client_socket_udp.sendto(message, (host_ip, UDP_PORT))
-    client_socket_udp.sendto(nomeVideo.encode("utf-8"), (host_ip, UDP_PORT))
+    mensagem = nomeVideo + "," + usuario
+    client_socket_udp.sendto(mensagem.encode("utf-8"), (host_ip, UDP_PORT))
     queue_audio = queue.Queue(maxsize=2000)
 
     video_mensagem = client_socket_udp.recv(BUFFER_SIZE)

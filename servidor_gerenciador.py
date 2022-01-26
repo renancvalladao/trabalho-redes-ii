@@ -112,6 +112,23 @@ def sairDaApp(usuario):
     conn.sendall(mensagem.encode("utf-8"))
 
 
+def getUserInformation(usuario):
+    arqUsuario = open("Usuarios/usuarios.txt")
+
+    linhas = arqUsuario.readlines()
+    arqUsuario.close()
+    usuario_info = ""
+
+    for linha in linhas:
+        linha_sem_barra_n = linha[0:len(linha) - 1]
+
+        if linha_sem_barra_n.split(" ")[0] == usuario:
+            usuario_info = linha_sem_barra_n
+            break
+    mensagem = mensagens.USER_INFORMATION + "," + usuario_info
+    conn.sendall(mensagem.encode("utf-8"))
+
+
 # Servidor Gerenciador na porta 5000
 def conectado(conn, client):
     print('Conectado por ', client)
@@ -133,6 +150,8 @@ def conectado(conn, client):
             removerUsuario(mensagem)
         elif mensagem[0] == mensagens.SAIR_DA_APP:
             sairDaApp(mensagem[1])
+        elif mensagem[0] == mensagens.GET_USER_INFORMATION:
+            getUserInformation(mensagem[1])
 
 
 # Inicializações
@@ -151,6 +170,7 @@ print("(TCP) Ouvindo em: ", socket_address)
 
 while True:
     # Aceita entrada de cliente
+    print("Aguardando conexao...")
     conn, addr = server_socket.accept()
     thread = threading.Thread(target=conectado, args=(conn, addr))
     thread.start()

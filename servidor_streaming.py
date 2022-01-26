@@ -48,7 +48,9 @@ def recebe_video_cliente(mensagem,client):
         threads[client] = ConnectionThread(server_socket, client)
         threads[client].start()
     if mensagem.find(".mp4") != -1:
-        threads[client].video = mensagem
+        data = mensagem.split(",")
+        threads[client].video = data[0]
+        threads[client].usuario = data[1]
     else:
         threads[client].mensagem = mensagem
     if mensagem == mensagens.PARAR_STREAMING:

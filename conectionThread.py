@@ -2,8 +2,10 @@ import base64
 import os
 import pickle
 import queue
+import socket
 import threading
 import time
+
 
 import cv2
 import imutils
@@ -17,10 +19,15 @@ class ConnectionThread(threading.Thread):
         super(ConnectionThread, self).__init__(*args, **kwargs)
         self.video = ''
         self.mensagem = ''
+        self.usuario = ''
         self.stop = False
         self.finish = False
         self.client = client
         self.server_socket = server_socket
+        # Conexão TCP
+        socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Socket TCP do cliente
+        socket_tcp.connect((socket.gethostbyname(socket.gethostname()), 5000))
+        self.socket_tcp = socket_tcp
 
     def run(self):
         while not self.finish:
@@ -28,10 +35,18 @@ class ConnectionThread(threading.Thread):
                 self.listarVideos()
                 self.mensagem = ''
             elif self.mensagem == mensagens.REPRODUZIR_VIDEO and self.video != '':
+                self.getUserInformation()
                 self.reproduzirVideo()
                 self.mensagem = ''
                 self.video = ''
                 self.stop = False
+
+    def getUserInformation(self):
+        mensagem = mensagens.GET_USER_INFORMATION + "," + self.usuario
+        self.socket_tcp.sendall(mensagem.encode("utf-8"))
+        data = self.socket_tcp.recv(1024)
+        resp = data.decode('utf-8').split(",")
+        print(resp)
 
     def listarVideos(self):
         self.server_socket.sendto(mensagens.LISTA_DE_VIDEOS.encode("utf-8"), self.client)
@@ -42,8 +57,8 @@ class ConnectionThread(threading.Thread):
         self.server_socket.sendto(pickle.dumps(lista_de_videos), self.client)
 
     def reproduzirVideo(self):
-        nomeVideo = self.video[0:(len(self.video)-9)]
-        resolucao = self.video[(len(self.video)-8):(len(self.video)-4)]
+        nomeVideo = self.video[0:(len(self.video) - 9)]
+        resolucao = self.video[(len(self.video) - 8):(len(self.video) - 4)]
         mensagem_video = "REPRODUZINDO O VÍDEO " + nomeVideo + ", COM RESOLUÇÃO " + resolucao
         self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
         # Fila 'q' dos frames
@@ -57,7 +72,7 @@ class ConnectionThread(threading.Thread):
 
         TS = (0.5 / FPS)
         fps, st, frames_to_count, cnt = (0, 0, 1, 0)
-        time.sleep(0.8) #Sleep para equiparar ao sleep do Audio
+        time.sleep(0.8)  # Sleep para equiparar ao sleep do Audio
         while not self.stop:
             try:
                 _, frame = video.read()
