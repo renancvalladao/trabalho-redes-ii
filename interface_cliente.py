@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 import mensagens
-import cliente_udp
+import cliente
 
 # Definição das constantes
 LB_FONT = ('arial', 12, 'bold')
@@ -112,7 +112,7 @@ class JanelaLogin:
             # Mensagem de erro
             messagebox.showerror("ERRO", "Todas as entradas devem \nser preenchidas")
         else:
-            resp = cliente_udp.entrarApp(usuario_logado, tipo_usuario_logado, end_ip)
+            resp = cliente.entrarApp(usuario_logado, tipo_usuario_logado, end_ip)
             if resp[0] == mensagens.ENTRAR_NA_APP_ACK:
                 messagebox.showinfo("Status", "Usuário criado com sucesso!")
             elif resp[0] == mensagens.STATUS_DO_USUARIO:
@@ -128,7 +128,7 @@ class JanelaLogin:
     # Fecha o programa
     def sair(self):
         if usuario_logado != "":
-            cliente_udp.sairApp(usuario_logado)
+            cliente.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -216,7 +216,7 @@ class JanelaMenu:
                                    command=self.bt_grupo_click, bg=BT_BACKGROUND_COLOR, fg=BT_FOREGROUND_COLOR)
             self.bt_grupo.place(relx=0.35, rely=0.25, relwidth=0.3, relheight=0.15)
 
-            resp = cliente_udp.criarGrupo(usuario_logado)
+            resp = cliente.criarGrupo(usuario_logado)
 
             # Para adicionar novos membros
             # arqGrupo = open("./Grupos/" + usuario_logado + ".txt","a")
@@ -225,7 +225,7 @@ class JanelaMenu:
 
         else:
             # Chama a janela de catálogo de vídeos (passa a janela atual)
-            resp = cliente_udp.verGrupo(usuario_logado)
+            resp = cliente.verGrupo(usuario_logado)
             global membros
             membros = resp[1].split(" ")
             JanelaGrupo(self)
@@ -233,7 +233,7 @@ class JanelaMenu:
     # Função executada ao clicar no botão bt_videos
     def bt_videos_click(self):
         # Recupera a lista de vídeos
-        lista_de_videos = cliente_udp.listarVideos()
+        lista_de_videos = cliente.listarVideos()
         # Chama a janela de catálogo de vídeos (passa a janela atual e a lista de vídeos)
         JanelaVideos(self, lista_de_videos, self.grupo)
 
@@ -245,7 +245,7 @@ class JanelaMenu:
     # Fecha o programa
     def sair(self):
         if usuario_logado != "":
-            cliente_udp.sairApp(usuario_logado)
+            cliente.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -366,7 +366,7 @@ class JanelaGrupo:
                     # Código para adicionar o usuário no grupo no 
                     # servidor gerenciador de serviços
                     # 
-                    cliente_udp.addUsuario(usuario_logado, nome)
+                    cliente.addUsuario(usuario_logado, nome)
                     # Adiciona o nome do vídeo na lista de vídeos da interface
                     self.membros.append(nome)
                     # Chama a função que atualiza a lista de vídeos da interface
@@ -396,7 +396,7 @@ class JanelaGrupo:
                 # Chama a função que atualiza a lista de membros na interface
                 self.atualiza_lista()
 
-                cliente_udp.removerUsuario(usuario_logado, self.membros)
+                cliente.removerUsuario(usuario_logado, self.membros)
 
             else:
                 messagebox.showerror("ERRO", "Você não pode se remover")
@@ -430,7 +430,7 @@ class JanelaGrupo:
     # Fecha o programa
     def sair(self):
         if usuario_logado != "":
-            cliente_udp.sairApp(usuario_logado)
+            cliente.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
@@ -564,7 +564,7 @@ class JanelaVideos:
         # self.streaming.get() = tipo de streaming
         nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
         # Código para pedir o vídeo ao servidor
-        cliente_udp.reproduzirVideo(nome_arquivo_video, usuario_logado)
+        cliente.reproduzirVideo(nome_arquivo_video, usuario_logado)
 
     # Volta para a janela de menu
     def voltar(self):
@@ -579,7 +579,7 @@ class JanelaVideos:
     # Fecha o programa
     def sair(self):
         if usuario_logado != "":
-            cliente_udp.sairApp(usuario_logado)
+            cliente.sairApp(usuario_logado)
         # Fecha a janela atual
         self.root.destroy()
 
