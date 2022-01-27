@@ -551,14 +551,18 @@ class JanelaVideos:
 
     # Função que pede o vídeo ao servidor
     def assistir_video(self):
-        # self.video = nome do arquivo do vídeo, self.resolucao.get() = resolução do vídeo, 
-        # self.streaming.get() = tipo de streaming
-        nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
-        # Código para pedir o vídeo ao servidor
-        #Verifica se é transmissao ao grupo ou individual
-        #print(self.streaming.get())
-        tipo_transmissao = self.streaming.get()
-        cliente.reproduzirVideoGrupo(nome_arquivo_video, usuario_logado,tipo_transmissao)
+        if tipo_usuario_logado == 'Premium':
+            # self.video = nome do arquivo do vídeo, self.resolucao.get() = resolução do vídeo, 
+            # self.streaming.get() = tipo de streaming
+            nome_arquivo_video = self.video + "_" + self.resolucao.get() + ".mp4"
+            # Código para pedir o vídeo ao servidor
+            #Verifica se é transmissao ao grupo ou individual
+            #print(self.streaming.get())
+            tipo_transmissao = self.streaming.get()
+            cliente.reproduzirVideoGrupo(nome_arquivo_video, usuario_logado,tipo_transmissao)
+            
+        elif tipo_usuario_logado == 'Convidado':
+            messagebox.showerror('ERRO', 'Usuários do tipo Convidado\nnão podem iniciar streaming')
         
     # Volta para a janela de menu
     def voltar(self):
