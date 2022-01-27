@@ -27,7 +27,9 @@ def reproduzirVideoGrupo(nomeVideo, usuario, flagGrupo):
     if flagGrupo == "Individual":
         reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
     elif flagGrupo == "Grupo":
+        reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
 
+        ''' 
         #Verificar membros do grupo
         arqGrupo = open("./Grupos/" + usuario + ".txt")
         linhas = arqGrupo.readlines()
@@ -82,7 +84,7 @@ def reproduzirVideoGrupo(nomeVideo, usuario, flagGrupo):
         #t1.start()
         #t2 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,client_socket_udp_parm), args=())
         #t2.start()
-
+        '''
 
 def reproduzirVideo(nomeVideo, usuario,client_socket_udp_parm,audio_socket_parm):
 
