@@ -4,6 +4,8 @@ import threading
 import mensagens
 from audioThread import AudioThread
 from conectionThread import ConnectionThread
+from guardaSocketCliente import GuardaSocketCliente
+import json
 
 
 def getIP():
@@ -34,6 +36,8 @@ audio_socket.bind((host_ip, (UDP_PORT - 1)))
 
 
 def recebe_audio_cliente(msg,client_addr,audio_threads):
+        print("Entrei recebe audio")
+        print("Client audio:",client_addr)
         if msg == b'Stop':
             audio_threads[client_addr].stop = True
         else:
@@ -43,7 +47,24 @@ def recebe_audio_cliente(msg,client_addr,audio_threads):
 
 def recebe_video_cliente(mensagem,client):
     mensagem = mensagem.decode("utf-8")
-    print(mensagem, client)
+    
+    if mensagem == mensagens.GUARDA_SOCKET:
+        mensagem, client = server_socket.recvfrom(BUFFER_SIZE)
+        mensagem = mensagem.decode("utf-8")
+        print("Client video:",mensagem)
+        print("Client video:",client)
+        GuardaSocketCliente.insere_socket(mensagem,client[1])
+
+    if mensagem == mensagens.RETORNA_SOCKET:
+        users_list = []
+        users_list = GuardaSocketCliente.get_porta()
+        print("Lista dos users")
+        print(users_list)
+
+        with open('./InternalUserInfo/informacao_porta.json', 'w') as f:
+            json.dump(users_list, f)
+
+
     if client not in threads:
         threads[client] = ConnectionThread(server_socket, client)
         threads[client].start()

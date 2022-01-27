@@ -5,7 +5,8 @@ import queue
 import socket
 import threading
 import time
-
+import json
+import time
 
 import cv2
 import imutils
@@ -36,7 +37,7 @@ class ConnectionThread(threading.Thread):
                 self.mensagem = ''
             elif self.mensagem == mensagens.REPRODUZIR_VIDEO and self.video != '':
                 self.getUserInformation()
-                self.reproduzirVideo()
+                self.reproduzirVideoThread()
                 self.mensagem = ''
                 self.video = ''
                 self.stop = False
@@ -56,11 +57,50 @@ class ConnectionThread(threading.Thread):
         lista_de_videos.update(lista_de_videos_total)
         self.server_socket.sendto(pickle.dumps(lista_de_videos), self.client)
 
-    def reproduzirVideo(self):
+    def reproduzirVideoThread(self):
+        with open('./InternalUserInfo/informacao_porta.json', 'r') as openfile: 
+            json_object = json.load(openfile) 
+
+        tam = len(json_object)
+        i = 0
+        porta = []
+        print("tam=",tam)
+        while(i < tam):
+            porta.append(json_object[i][1])
+            i += 1
+        print(porta)
+        
+        if tam == 1:
+            self.reproduzirVideo(0)
+        else:
+            i = 0
+            while(i < tam):
+                print("Passando no while")
+                print("i=",i)
+                print("tam=",tam)
+                print(porta[i])
+                t1 = threading.Thread(target=self.reproduzirVideo(porta[i]), args=())
+                t1.start()
+                print("depois threading")
+                i += 2
+
+    def reproduzirVideo(self,porta):
         nomeVideo = self.video[0:(len(self.video) - 9)]
         resolucao = self.video[(len(self.video) - 8):(len(self.video) - 4)]
         mensagem_video = "REPRODUZINDO O VÍDEO " + nomeVideo + ", COM RESOLUÇÃO " + resolucao
-        self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
+        if porta != 0:
+            #self.server_socket.sendto(mensagem_video.encode("utf-8"), (str(self.client[0]), int(porta)))
+            self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
+        else:
+            self.server_socket.sendto(mensagem_video.encode("utf-8"), self.client)
+        print("VEEEER AQUI ")
+        print(mensagem_video)
+        print(self.client[0])
+        print(self.client[1])
+        print(porta)
+        #if porta != 0:
+        #    self.client[1] = porta
+            
         # Fila 'q' dos frames
         q = queue.Queue(maxsize=10)
 
@@ -84,7 +124,11 @@ class ConnectionThread(threading.Thread):
             encoded, buffer = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_JPEG_QUALITY,
                                                             80])  # Colocar/Encode a imagem em JPEG com qualidade de 80% após o resize
             message = base64.b64encode(buffer)  # Converter dado binário em texto e vice versa com base64
-            self.server_socket.sendto(message, self.client)  # Envio da mensagem ao cliente (do frame)
+            if porta != 0:
+                #self.server_socket.sendto(message, (str(self.client[0]), int(porta)))  # Envio da mensagem ao cliente (do frame)
+                self.server_socket.sendto(message, self.client)  # Envio da mensagem ao cliente (do frame)
+            else:
+                self.server_socket.sendto(message, self.client)  # Envio da mensagem ao cliente (do frame)
 
             # Controle de frames ao enviar a 'message'
             if cnt == frames_to_count:

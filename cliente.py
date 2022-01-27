@@ -10,10 +10,13 @@ import numpy as np
 import pyaudio
 
 import mensagens
+import json
+
+from guardaSocketCliente import GuardaSocketCliente
 
 pararAudio = False
 reproduzindoVideo = False
-
+users_grupo = []
 
 def getIP():
     return socket.gethostbyname(socket.gethostname())
@@ -25,11 +28,15 @@ def getHostName():
 
 def reproduzirVideoGrupo(nomeVideo, usuario, flagGrupo):
     if flagGrupo == "Individual":
+        message = mensagens.RETORNA_SOCKET.encode("utf-8")  # Mensagem enviada ao servidor
+        client_socket_udp.sendto(message, (host_ip, UDP_PORT))
         reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
     elif flagGrupo == "Grupo":
-        reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
-
-        ''' 
+        
+        message = mensagens.RETORNA_SOCKET.encode("utf-8")  # Mensagem enviada ao servidor
+        client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+    
+        '''
         #Verificar membros do grupo
         arqGrupo = open("./Grupos/" + usuario + ".txt")
         linhas = arqGrupo.readlines()
@@ -42,49 +49,8 @@ def reproduzirVideoGrupo(nomeVideo, usuario, flagGrupo):
             membros.append(linha_sem_barra_n)
 
         tamanhoGrupo = len(membros)
-
-        #Pegando socket video
-        i = 0
-        socket_video = []
-        while (i < tamanhoGrupo):
-            arqVideoSocket = open("./InternalUserInfo/VideoSocket/" + membros[i] + ".txt")
-            linhaLida = arqVideoSocket.read()
-            arqVideoSocket.close()
-
-            branco = linhaLida.find(" ")
-            socket_video.append(linhaLida[branco+1:len(linhaLida)])
-            i += 1
-
-        print("aqui socket video")
-        print(socket_video)
-
-
-        #Pegando socket audio
-        i = 0
-        socket_audio = []
-        while (i < tamanhoGrupo):
-            arqAudioSocket = open("./InternalUserInfo/AudioSocket/" + membros[i] + ".txt")
-            linhaLida = arqAudioSocket.read()
-            arqAudioSocket.close()
-
-            branco = linhaLida.find(" ")
-            socket_audio.append(linhaLida[branco+1:len(linhaLida)])
-            i += 1
-
-        print("aqui socket video")
-        print(socket_audio)
-        
-        i = 0
-        while (i < tamanhoGrupo):
-            t1 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,socket_video[i],socket_audio[i]), args=())
-            t1.start()
-            i += 1
-
-        #t1 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,client_socket_udp[1],audio_socket[1]), args=())
-        #t1.start()
-        #t2 = threading.Thread(target=reproduzirVideo(nomeVideo,usuario,client_socket_udp_parm), args=())
-        #t2.start()
         '''
+        reproduzirVideo(nomeVideo, usuario,client_socket_udp,audio_socket)
 
 def reproduzirVideo(nomeVideo, usuario,client_socket_udp_parm,audio_socket_parm):
 
@@ -178,21 +144,10 @@ def listarVideos():
 
 def entrarApp(usuario, tipo, ip):
 
-    #Gravar socket de vídeo
-    arqInternalUserInfo = open("./InternalUserInfo/VideoSocket/" + usuario + ".txt", "w")
-    arqInternalUserInfo.write(usuario)
-    arqInternalUserInfo.write(" ")
-    arqInternalUserInfo.write(str(client_socket_udp))
-    arqInternalUserInfo.close()
-    print(client_socket_udp)
-
-    #Gravar socket de áudio
-    arqInternalUserInfo = open("./InternalUserInfo/AudioSocket/" + usuario + ".txt", "w")
-    arqInternalUserInfo.write(usuario)
-    arqInternalUserInfo.write(" ")
-    arqInternalUserInfo.write(str(audio_socket))
-    arqInternalUserInfo.close()
-    print(audio_socket)
+    message = mensagens.GUARDA_SOCKET.encode("utf-8")  # Mensagem enviada ao servidor
+    client_socket_udp.sendto(message, (host_ip, UDP_PORT))
+    message = usuario.encode("utf-8")
+    client_socket_udp.sendto(message, (host_ip, UDP_PORT))
 
     #EntrarApp
     mensagem = mensagens.ENTRAR_NA_APP + "," + usuario + "," + tipo + "," + ip
